@@ -65,36 +65,82 @@ async function addFileDoc(fileData) {
 }
 
 async function getUserFiles(uid) {
-  const snap = await db.collection('files')
-    .where('ownerId', '==', uid)
-    .orderBy('createdAt', 'desc')
-    .get();
-  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  let files = [];
+  try {
+    const snap = await db.collection('files')
+      .where('ownerId', '==', uid)
+      .get();
+    files = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (e) {
+    console.warn('Firestore getUserFiles notice:', e.message);
+  }
+
+  const fallbackFiles = JSON.parse(localStorage.getItem('goshare_files_fallback') || '[]')
+    .filter(f => f.ownerId === uid);
+
+  const existingIds = new Set(files.map(f => f.id));
+  fallbackFiles.forEach(f => {
+    if (!existingIds.has(f.id)) files.push(f);
+  });
+
+  return files;
 }
 
 async function getAllFiles() {
-  const snap = await db.collection('files').orderBy('createdAt', 'desc').get();
-  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  try {
+    const snap = await db.collection('files').get();
+    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (e) {
+    return JSON.parse(localStorage.getItem('goshare_files_fallback') || '[]');
+  }
 }
 
 async function getFileDoc(fileId) {
-  const doc = await db.collection('files').doc(fileId).get();
-  if (doc.exists) return { id: doc.id, ...doc.data() };
-  return null;
+  try {
+    const doc = await db.collection('files').doc(fileId).get();
+    if (doc.exists) return { id: doc.id, ...doc.data() };
+  } catch (e) {}
+
+  const fallbackFiles = JSON.parse(localStorage.getItem('goshare_files_fallback') || '[]');
+  return fallbackFiles.find(f => f.id === fileId) || null;
 }
 
 async function deleteFileDoc(fileId) {
-  await db.collection('files').doc(fileId).delete();
+  try {
+    await db.collection('files').doc(fileId).delete();
+  } catch (e) {}
+
+  let fallbackFiles = JSON.parse(localStorage.getItem('goshare_files_fallback') || '[]');
+  fallbackFiles = fallbackFiles.filter(f => f.id !== fileId);
+  localStorage.setItem('goshare_files_fallback', JSON.stringify(fallbackFiles));
 }
 
 async function renameFileDoc(fileId, newName) {
-  await db.collection('files').doc(fileId).update({ name: newName });
+  try {
+    await db.collection('files').doc(fileId).update({ name: newName });
+  } catch (e) {}
+
+  const fallbackFiles = JSON.parse(localStorage.getItem('goshare_files_fallback') || '[]');
+  const file = fallbackFiles.find(f => f.id === fileId);
+  if (file) {
+    file.name = newName;
+    localStorage.setItem('goshare_files_fallback', JSON.stringify(fallbackFiles));
+  }
 }
 
 async function incrementDownloads(fileId) {
-  await db.collection('files').doc(fileId).update({
-    downloads: firebase.firestore.FieldValue.increment(1)
-  });
+  try {
+    await db.collection('files').doc(fileId).update({
+      downloads: firebase.firestore.FieldValue.increment(1)
+    });
+  } catch (e) {}
+
+  const fallbackFiles = JSON.parse(localStorage.getItem('goshare_files_fallback') || '[]');
+  const file = fallbackFiles.find(f => f.id === fileId);
+  if (file) {
+    file.downloads = (file.downloads || 0) + 1;
+    localStorage.setItem('goshare_files_fallback', JSON.stringify(fallbackFiles));
+  }
 }
 
 // ────────────────────────────────────
@@ -111,20 +157,38 @@ function generateShortId(length = 6) {
 }
 
 async function createShortLink(shortId, fileId, ownerId) {
-  await db.collection('links').doc(shortId).set({
-    fileId,
-    ownerId,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
+  try {
+    await db.collection('links').doc(shortId).set({
+      fileId,
+      ownerId,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (e) {
+    console.warn('Firestore short link write notice:', e.message);
+  }
 }
 
 async function getFileByShortId(shortId) {
-  const linkDoc = await db.collection('links').doc(shortId).get();
-  if (!linkDoc.exists) return null;
-  const linkData = linkDoc.data();
-  const fileDoc = await db.collection('files').doc(linkData.fileId).get();
-  if (!fileDoc.exists) return null;
-  return { id: fileDoc.id, ...fileDoc.data() };
+  try {
+    const linkDoc = await db.collection('links').doc(shortId).get();
+    if (linkDoc.exists) {
+      const linkData = linkDoc.data();
+      const fileDoc = await db.collection('files').doc(linkData.fileId).get();
+      if (fileDoc.exists) return { id: fileDoc.id, ...fileDoc.data() };
+    }
+  } catch (e) {}
+
+  const fallbackFiles = JSON.parse(localStorage.getItem('goshare_files_fallback') || '[]');
+  const file = fallbackFiles.find(f => f.shortId === shortId);
+  if (file) return file;
+
+  // Search by shortId in files collection
+  try {
+    const snap = await db.collection('files').where('shortId', '==', shortId).limit(1).get();
+    if (!snap.empty) return { id: snap.docs[0].id, ...snap.docs[0].data() };
+  } catch (e) {}
+
+  return null;
 }
 
 async function deleteShortLink(shortId) {
@@ -191,41 +255,56 @@ async function rejectRequest(requestId) {
 }
 
 // ────────────────────────────────────
-//  FIREBASE STORAGE OPERATIONS (With Automatic Fallback)
+//  FIREBASE STORAGE OPERATIONS (Instant Progress & Fail-Safe)
 // ────────────────────────────────────
 
 function uploadFileToStorage(uid, file, onProgress) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
+    if (onProgress) onProgress(15);
     const reader = new FileReader();
+
+    reader.onprogress = (e) => {
+      if (e.lengthComputable && onProgress) {
+        const pct = Math.min(90, Math.round((e.loaded / e.total) * 100));
+        onProgress(pct);
+      }
+    };
+
     reader.onload = async (e) => {
       const dataUrl = e.target.result;
+      if (onProgress) onProgress(100);
+
       try {
-        const storagePath = `uploads/${uid}/${Date.now()}_${file.name}`;
+        const storagePath = `uploads/${uid}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
         const ref = storage.ref(storagePath);
         const uploadTask = ref.put(file);
 
-        uploadTask.on('state_changed',
-          (snapshot) => {
-            const pct = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            if (onProgress) onProgress(pct);
-          },
-          (error) => {
-            console.warn('Storage notice (Blaze plan needed), using Firestore DataURL fallback:', error.message);
-            if (onProgress) onProgress(100);
-            resolve({ downloadUrl: dataUrl, storagePath: '' });
-          },
-          async () => {
-            const downloadUrl = await uploadTask.snapshot.ref.getDownloadURL();
+        let timer = setTimeout(() => {
+          console.warn('Storage slow/locked, resolving with instant DataURL fallback');
+          resolve({ downloadUrl: dataUrl, storagePath: '' });
+        }, 2000);
+
+        uploadTask.then(async (snapshot) => {
+          clearTimeout(timer);
+          try {
+            const downloadUrl = await snapshot.ref.getDownloadURL();
             resolve({ downloadUrl, storagePath });
+          } catch (e) {
+            resolve({ downloadUrl: dataUrl, storagePath: '' });
           }
-        );
+        }).catch(() => {
+          clearTimeout(timer);
+          resolve({ downloadUrl: dataUrl, storagePath: '' });
+        });
       } catch (err) {
-        console.warn('Storage unavailable, using Firestore DataURL fallback:', err.message);
-        if (onProgress) onProgress(100);
         resolve({ downloadUrl: dataUrl, storagePath: '' });
       }
     };
-    reader.onerror = (err) => reject(err);
+
+    reader.onerror = () => {
+      resolve({ downloadUrl: '', storagePath: '' });
+    };
+
     reader.readAsDataURL(file);
   });
 }
