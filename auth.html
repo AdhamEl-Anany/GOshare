@@ -294,6 +294,12 @@
         <h2>Welcome back 👋</h2>
         <p class="auth-subtitle">Sign in to access your files</p>
 
+        <!-- Switch Account Quick Action -->
+        <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(0,200,83,0.08);border:1px dashed var(--green-500);border-radius:var(--radius-md);padding:10px 14px;margin-bottom:16px">
+          <span style="font-size:0.82rem;color:var(--text-secondary)">Want to use a different account?</span>
+          <button type="button" class="btn btn-sm btn-glass" onclick="switchAccount()" style="color:var(--green-400);font-weight:700">🔄 Switch Account</button>
+        </div>
+
         <div class="social-btns">
           <button class="social-btn" type="button" onclick="loginWithGoogle()">
             🌐 Google

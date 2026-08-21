@@ -62,30 +62,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
       setLoading(btn, true);
 
-      try {
-        await auth.signInWithEmailAndPassword(email, password);
-        showToast('Welcome back! Redirecting…', 'success');
-        setTimeout(() => window.location.href = email === ADMIN_EMAIL ? 'admin.html' : 'dashboard.html', 800);
-      } catch (error) {
-        // Auto-create Admin account if logging in with Admin credentials for the first time
-        if (email === ADMIN_EMAIL && password === 'toqa1402') {
-          try {
-            const cred = await auth.createUserWithEmailAndPassword(email, password);
-            await cred.user.updateProfile({ displayName: 'ENG.Adham Hany' });
-            await createUserDoc(cred.user.uid, {
-              name: 'ENG.Adham Hany',
-              email: email,
-              plan: 'business',
-              role: 'admin'
-            });
-            showToast('Welcome Admin! Redirecting to Admin Panel… 🔑', 'success');
-            setTimeout(() => window.location.href = 'admin.html', 800);
-            return;
-          } catch (createErr) {
-            console.error('Admin create error:', createErr);
+      // Special Admin Login Handling
+      if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+        if (password !== 'toqa1402') {
+          setLoading(btn, false);
+          showFieldError('login-pass-err', 'Incorrect Admin password');
+          shakeForm(loginForm);
+          return;
+        }
+
+        try {
+          await auth.signInWithEmailAndPassword(email, password);
+        } catch (err) {
+          if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+            try {
+              const cred = await auth.createUserWithEmailAndPassword(email, password);
+              await cred.user.updateProfile({ displayName: 'ENG.Adham Hany' });
+              await createUserDoc(cred.user.uid, {
+                name: 'ENG.Adham Hany',
+                email: email,
+                plan: 'business',
+                role: 'admin'
+              });
+            } catch (cErr) {
+              console.warn('Admin account creation notice:', cErr);
+            }
           }
         }
 
+        showToast('Welcome Admin! Redirecting to Admin Panel… 🔑', 'success');
+        setTimeout(() => window.location.href = 'admin.html', 800);
+        return;
+      }
+
+      // Normal User Login
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        showToast('Welcome back! Redirecting…', 'success');
+        setTimeout(() => window.location.href = 'dashboard.html', 800);
+      } catch (error) {
         setLoading(btn, false);
         let msg = 'Invalid email or password';
         if (error.code === 'auth/user-not-found') msg = 'No account found with this email';
