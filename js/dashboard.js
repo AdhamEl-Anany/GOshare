@@ -472,12 +472,35 @@ function initUploadZone() {
   });
 }
 
+// Rate Limiting & Malware Filter Configuration
+window.userUploadHistory = window.userUploadHistory || [];
+const BLOCKED_EXTENSIONS = ['exe', 'bat', 'vbs', 'cmd', 'sh', 'php', 'msi', 'scr', 'ps1', 'cgi', 'jar', 'dll', 'com', 'pif'];
+const MAX_UPLOADS_PER_MINUTE = 5;
+
 async function handleFilesUpload(files) {
   const list = document.getElementById('upload-progress-list');
   if (!list) return;
+
+  // 1. Rate Limiting Check (Anti-Abuse)
+  const now = Date.now();
+  window.userUploadHistory = window.userUploadHistory.filter(t => now - t < 60000);
+  if (window.userUploadHistory.length + files.length > MAX_UPLOADS_PER_MINUTE) {
+    showToast('⚠️ Rate limit reached: Max 5 uploads per minute allowed for abuse protection.', 'error');
+    return;
+  }
+
   list.style.display = 'flex';
 
   for (const file of files) {
+    // 2. Dangerous Malware & Executable Script Filter
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (BLOCKED_EXTENSIONS.includes(ext)) {
+      showToast(`🚫 Blocked: Executable files (.${ext}) are prohibited for platform security.`, 'error');
+      continue;
+    }
+
+    window.userUploadHistory.push(Date.now());
+
     const itemId = 'u' + Date.now() + Math.random().toString(36).slice(2, 6);
     const item = document.createElement('div');
     item.className = 'upload-progress-item';

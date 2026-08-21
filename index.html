@@ -415,20 +415,20 @@
 <section class="stats-section">
   <div class="stats-grid-hero">
     <div class="reveal">
-      <span class="stat-hero-val" data-counter data-target="14000000" data-suffix="+">0</span>
+      <span class="stat-hero-val" id="live-stat-files">0</span>
       <div class="stat-hero-lbl">Files Shared</div>
     </div>
     <div class="reveal delay-1">
-      <span class="stat-hero-val" data-counter data-target="3200000" data-suffix="+">0</span>
-      <div class="stat-hero-lbl">Happy Users</div>
+      <span class="stat-hero-val" id="live-stat-users">0</span>
+      <div class="stat-hero-lbl">Registered Users</div>
     </div>
     <div class="reveal delay-2">
-      <span class="stat-hero-val" data-counter data-target="99" data-suffix=".9%">0</span>
-      <div class="stat-hero-lbl">Uptime</div>
+      <span class="stat-hero-val" id="live-stat-uptime">99.9%</span>
+      <div class="stat-hero-lbl">Service Uptime</div>
     </div>
     <div class="reveal delay-3">
-      <span class="stat-hero-val" data-counter data-target="150" data-suffix=" TB">0</span>
-      <div class="stat-hero-lbl">Stored Daily</div>
+      <span class="stat-hero-val" id="live-stat-storage">0 MB</span>
+      <div class="stat-hero-lbl">Cloud Storage Used</div>
     </div>
   </div>
 </section>
@@ -449,8 +449,8 @@
     </div>
     <div class="feature-card reveal delay-1">
       <div class="feature-icon">🔒</div>
-      <h3>End-to-End Security</h3>
-      <p>All files are encrypted at rest and in transit with AES-256. Your data is always protected.</p>
+      <h3>TLS/SSL Encrypted Transfer</h3>
+      <p>All file transfers are encrypted in transit via SSL/TLS with secure Firebase Cloud Storage access controls.</p>
     </div>
     <div class="feature-card reveal delay-2">
       <div class="feature-icon">🔗</div>
@@ -564,7 +564,31 @@
   </div>
 </footer>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/db.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/main.js"></script>
+<script>
+// Fetch and display real live stats from Firebase
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const stats = await getAdminStats();
+    const elFiles = document.getElementById('live-stat-files');
+    const elUsers = document.getElementById('live-stat-users');
+    const elStorage = document.getElementById('live-stat-storage');
+
+    if (elFiles) animateCounter(elFiles, stats.totalFiles || 0, 1200);
+    if (elUsers) animateCounter(elUsers, stats.totalUsers || 0, 1200);
+    if (elStorage) elStorage.textContent = formatSize(stats.totalStorage || 0);
+  } catch (e) {
+    console.warn('Real stats load notice:', e);
+  }
+});
+</script>
 </body>
 </html>
