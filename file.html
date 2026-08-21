@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Download File – GOshare</title>
+  <meta name="description" content="Download your file from GOshare — fast, secure, and free." />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .file-page {
+      min-height: 100vh;
+      padding: 120px 24px 80px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .file-container {
+      width: 100%;
+      max-width: 800px;
+    }
+
+    /* Hero card */
+    .file-hero-card {
+      background: var(--bg-card);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-xl);
+      padding: 48px 40px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+      animation: fadeInUp 0.6s ease;
+    }
+    .file-hero-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--grad-hero);
+    }
+
+    .file-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+    }
+
+    .file-big-icon {
+      font-size: 5rem;
+      line-height: 1;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 20px rgba(0,200,83,0.3));
+      animation: float 4s ease-in-out infinite;
+    }
+
+    .file-info { flex: 1; min-width: 0; }
+    .file-info h1 {
+      font-size: 1.4rem;
+      word-break: break-all;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    .file-badges {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .file-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 36px;
+      padding: 20px;
+      background: rgba(0,200,83,0.04);
+      border: 1px solid rgba(0,200,83,0.1);
+      border-radius: var(--radius-lg);
+    }
+    .meta-item { text-align: center; }
+    .meta-item .meta-val {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--green-400);
+      display: block;
+      margin-bottom: 2px;
+    }
+    .meta-item .meta-lbl { font-size: 0.78rem; color: var(--text-muted); }
+
+    /* Download area */
+    .download-area { text-align: center; }
+
+    #download-btn {
+      font-size: 1.15rem;
+      padding: 18px 48px;
+      border-radius: var(--radius-full);
+      box-shadow: 0 8px 40px rgba(0,200,83,0.5);
+      margin-bottom: 12px;
+      display: inline-flex;
+    }
+
+    .download-note {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      margin-bottom: 24px;
+    }
+
+    /* Download progress */
+    #download-progress {
+      margin: 20px 0;
+      display: none;
+    }
+    .dl-progress-bar {
+      height: 10px;
+      background: rgba(255,255,255,0.06);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-bottom: 10px;
+      position: relative;
+    }
+    #download-progress-fill {
+      height: 100%;
+      background: var(--grad-green);
+      border-radius: var(--radius-full);
+      width: 0;
+      transition: width 0.2s linear;
+      position: relative;
+      overflow: hidden;
+    }
+    #download-progress-fill::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+      animation: shimmer 1.5s infinite;
+    }
+    .dl-progress-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+    #download-status { color: var(--text-secondary); }
+    #download-progress-text { color: var(--green-400); font-weight: 700; font-size: 1rem; }
+
+    /* Share section */
+    .share-card {
+      background: var(--bg-card);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-xl);
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      animation: fadeInUp 0.6s ease 0.2s both;
+    }
+    .share-card h3 { font-size: 1rem; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+    .share-url-wrap {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    #share-url {
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-md);
+      padding: 11px 14px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-family: monospace;
+      outline: none;
+    }
+
+    .share-social-btns {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .share-social {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--bg-border);
+      background: rgba(255,255,255,0.03);
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+    .share-social:hover { background: var(--glass-bg); color: var(--text-primary); transform: translateY(-2px); }
+
+    /* Info card */
+    .info-card {
+      background: var(--bg-card);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-xl);
+      padding: 28px 32px;
+      animation: fadeInUp 0.6s ease 0.4s both;
+    }
+    .info-card h3 { font-size: 1rem; margin-bottom: 16px; }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.88rem;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .info-key { color: var(--text-muted); }
+    .info-row .info-val { color: var(--text-primary); font-weight: 500; }
+
+    /* Safety banner */
+    .safety-banner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(0,200,83,0.06);
+      border: 1px solid rgba(0,200,83,0.15);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 20px;
+    }
+
+    /* Breadcrumb */
+    .file-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .file-breadcrumb a { color: var(--green-400); }
+    .file-breadcrumb span { color: var(--text-dim); }
+
+    @media (max-width: 600px) {
+      .file-meta-grid { grid-template-columns: repeat(2, 1fr); }
+      .file-hero-card { padding: 28px 20px; }
+      #download-btn { font-size: 1rem; padding: 16px 32px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon">💎</div>
+      <span>GOshare</span>
+    </a>
+    <div class="nav-actions">
+      <a href="auth.html" class="btn btn-outline btn-sm">Log In</a>
+      <a href="auth.html" class="btn btn-primary btn-sm">Sign Up Free</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── FILE PAGE ── -->
+<main class="file-page">
+  <div class="file-container" id="file-main">
+
+    <!-- Breadcrumb -->
+    <div class="file-breadcrumb">
+      <a href="index.html">🏠 GOshare</a>
+      <span>›</span>
+      <span>File Download</span>
+    </div>
+
+    <!-- File Hero -->
+    <div class="file-hero-card">
+      <div class="file-top">
+        <div class="file-big-icon" id="file-icon">📁</div>
+        <div class="file-info">
+          <h1 data-file-name>Loading file…</h1>
+          <div class="file-badges">
+            <span class="badge badge-green">✓ Safe File</span>
+            <span class="badge badge-diamond" id="file-type-badge">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Meta grid -->
+      <div class="file-meta-grid">
+        <div class="meta-item">
+          <span class="meta-val" id="file-size">—</span>
+          <span class="meta-lbl">File Size</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-val" id="file-type">—</span>
+          <span class="meta-lbl">File Type</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-val" id="file-date">—</span>
+          <span class="meta-lbl">Upload Date</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-val" id="file-downloads">0</span>
+          <span class="meta-lbl">Downloads</span>
+        </div>
+      </div>
+
+      <!-- Download Area -->
+      <div class="download-area">
+        <button class="btn btn-primary btn-lg" id="download-btn">
+          ⬇️ Download File
+        </button>
+        <div class="download-note">Free download · No registration required</div>
+
+        <!-- Progress -->
+        <div id="download-progress">
+          <div class="dl-progress-bar">
+            <div id="download-progress-fill"></div>
+          </div>
+          <div class="dl-progress-info">
+            <span id="download-status">Starting download…</span>
+            <span id="download-progress-text">0%</span>
+          </div>
+        </div>
+
+        <div class="safety-banner">
+          🔒 This file was scanned and verified safe by GOshare. All transfers are encrypted with SSL.
+        </div>
+      </div>
+    </div>
+
+    <!-- Share Card -->
+    <div class="share-card">
+      <h3>🔗 Share this file</h3>
+      <div class="share-url-wrap">
+        <input type="text" id="share-url" readonly />
+        <button class="btn btn-primary btn-sm" id="copy-link-btn">📋 Copy</button>
+      </div>
+      <div class="share-social-btns">
+        <button class="share-social" onclick="showToast('Share to WhatsApp!','info')">📱 WhatsApp</button>
+        <button class="share-social" onclick="showToast('Share to Telegram!','info')">✈️ Telegram</button>
+        <button class="share-social" onclick="showToast('Share to Twitter!','info')">🐦 Twitter</button>
+        <button class="share-social" onclick="showToast('Share by Email!','info')">📧 Email</button>
+      </div>
+    </div>
+
+    <!-- Info Card -->
+    <div class="info-card">
+      <h3>📋 File Details</h3>
+      <div class="info-row">
+        <span class="info-key">File Name</span>
+        <span class="info-val" data-file-name>—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Size</span>
+        <span class="info-val" id="file-size-detail">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Format</span>
+        <span class="info-val" id="file-type-detail">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Uploaded</span>
+        <span class="info-val" id="file-date-detail">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Status</span>
+        <span class="info-val" style="color:var(--green-400)">✓ Available</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Host</span>
+        <span class="info-val">GOshare Cloud</span>
+      </div>
+    </div>
+
+    <!-- Back to GOshare -->
+    <div style="text-align:center;margin-top:32px">
+      <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:16px">Want to share your own files?</p>
+      <a href="auth.html" class="btn btn-primary">🚀 Create Free Account</a>
+    </div>
+
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="nav-logo" style="font-size:1.3rem">
+        <div class="logo-icon" style="width:30px;height:30px;font-size:0.9rem">💎</div>
+        <span>GOshare</span>
+      </a>
+      <p>The fastest, most secure cloud file sharing platform. Developed & Managed by <strong>ENG.Adham Hany</strong>.</p>
+      <div class="footer-socials">
+        <a href="https://www.facebook.com/share/18zxWztWGU/?mibextid=wwXIfr" target="_blank" class="footer-social-btn" title="Facebook">📘</a>
+        <a href="https://www.tiktok.com/@adham_01130?_r=1&_t=ZS-98JYKSfhp2K" target="_blank" class="footer-social-btn" title="TikTok">🎵</a>
+        <a href="https://www.instagram.com/elanany.adham?igsh=Ymh0bTN0MHp3OWp1&utm_source=qr" target="_blank" class="footer-social-btn" title="Instagram">📸</a>
+        <a href="https://www.linkedin.com/in/adham-hany-93878933a?utm_source=share_via&utm_content=profile&utm_medium=member_ios" target="_blank" class="footer-social-btn" title="LinkedIn">💼</a>
+        <a href="https://github.com/AdhamEl-Anany" target="_blank" class="footer-social-btn" title="GitHub">💻</a>
+        <a href="https://www.youtube.com/channel/UCjukCoewJ849qKGY2-csxlw" target="_blank" class="footer-social-btn" title="YouTube">▶️</a>
+      </div>
+    </div>
+    <div class="footer-col"><h4>Product</h4><ul><li><a href="pricing.html">Pricing</a></li><li><a href="dashboard.html">My Files</a></li><li><a href="admin.html">Admin Panel</a></li></ul></div>
+    <div class="footer-col"><h4>Developer</h4><ul><li><a href="https://github.com/AdhamEl-Anany" target="_blank">ENG.Adham Hany</a></li><li><a href="https://www.linkedin.com/in/adham-hany-93878933a" target="_blank">LinkedIn Profile</a></li><li><a href="admin.html">Admin Login</a></li></ul></div>
+    <div class="footer-col"><h4>Legal & Support</h4><ul><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Service</a></li><li><a href="https://wa.me/?text=GOshare%20Support" target="_blank">WhatsApp Support</a></li></ul></div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 GOshare. All rights reserved. | Developed by <strong>ENG.Adham Hany</strong></p>
+    <p>Made with 💚 for the world</p>
+  </div>
+</footer>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/db.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/file.js"></script>
+</body>
+</html>

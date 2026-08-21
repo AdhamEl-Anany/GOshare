@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Files – GOshare Dashboard</title>
+  <meta name="description" content="Manage, upload, and share your files with the GOshare dashboard." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="btn btn-glass btn-icon" id="sidebar-toggle" aria-label="Toggle sidebar" style="display:none;">☰</button>
+      <a href="index.html" class="nav-logo">
+        <div class="logo-icon">💎</div>
+        <span>GOshare</span>
+      </a>
+    </div>
+
+    <div class="search-wrap" style="flex:1;max-width:360px;margin:0 32px">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" type="search" id="dash-search" placeholder="Search files…" />
+    </div>
+
+    <div class="nav-actions">
+      <a href="pricing.html" class="btn btn-diamond btn-sm">💎 Upgrade</a>
+      <div style="position:relative">
+        <button class="btn btn-glass btn-sm" id="user-menu-btn" style="gap:8px">
+          <span style="width:28px;height:28px;border-radius:50%;background:var(--grad-green);display:inline-flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;flex-shrink:0">👤</span>
+          <span data-user-name>User</span>
+          ▾
+        </button>
+        <div id="user-dropdown" style="display:none;position:absolute;right:0;top:calc(100% + 8px);background:var(--bg-card2);border:1px solid var(--glass-border);border-radius:var(--radius-md);padding:6px;min-width:180px;z-index:200;box-shadow:var(--shadow-card)">
+          <div style="padding:10px 14px;border-bottom:1px solid var(--bg-border);margin-bottom:4px">
+            <div style="font-size:0.85rem;font-weight:600" data-user-name>User</div>
+            <div style="font-size:0.78rem;color:var(--text-muted)" data-user-email>email</div>
+          </div>
+          <a href="pricing.html" class="context-menu-item">💎 &nbsp; Upgrade Plan</a>
+          <div class="context-menu-item" onclick="localStorage.removeItem('goshare_user');window.location.href='index.html'">🚪 &nbsp; Logout</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ── LAYOUT ── -->
+<div class="dashboard-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+      <div class="sidebar-section-label">Navigation</div>
+      <a href="dashboard.html" class="sidebar-link active" id="nav-myfiles">
+        <span class="link-icon">📁</span> My Files
+        <span class="link-badge" id="sidebar-file-count">0</span>
+      </a>
+      <a href="#" class="sidebar-link" onclick="showToast('Shared files coming soon!','info');return false">
+        <span class="link-icon">🔗</span> Shared by Me
+      </a>
+      <a href="#" class="sidebar-link" onclick="showToast('Shared with me coming soon!','info');return false">
+        <span class="link-icon">📨</span> Shared with Me
+      </a>
+      <a href="#" class="sidebar-link" onclick="showToast('Trash coming soon!','info');return false">
+        <span class="link-icon">🗑️</span> Trash
+      </a>
+
+      <div class="sidebar-section-label" style="margin-top:8px">File Types</div>
+      <a href="#" class="sidebar-link" data-filter="images" onclick="triggerFilter(event,'images')">
+        <span class="link-icon">🖼️</span> Images
+      </a>
+      <a href="#" class="sidebar-link" data-filter="videos" onclick="triggerFilter(event,'videos')">
+        <span class="link-icon">🎬</span> Videos
+      </a>
+      <a href="#" class="sidebar-link" data-filter="documents" onclick="triggerFilter(event,'documents')">
+        <span class="link-icon">📄</span> Documents
+      </a>
+      <a href="#" class="sidebar-link" data-filter="archives" onclick="triggerFilter(event,'archives')">
+        <span class="link-icon">🗜️</span> Archives
+      </a>
+
+      <div class="sidebar-section-label" style="margin-top:8px">Quick Access</div>
+      <a href="pricing.html" class="sidebar-link">
+        <span class="link-icon">💎</span> Upgrade Plan
+      </a>
+    </div>
+
+    <!-- Storage -->
+    <div class="sidebar-storage">
+      <div class="storage-label">
+        <span>Storage</span>
+        <span data-storage-pct>0%</span>
+      </div>
+      <div class="storage-bar">
+        <div class="storage-fill" data-storage-fill style="width:0%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:var(--text-dim);margin-bottom:12px">
+        <span data-storage-used>0 B</span>
+        <span>/ <span data-storage-max>10 GB</span></span>
+      </div>
+      <a href="pricing.html" class="btn btn-diamond btn-sm storage-upgrade">💎 Get More Space</a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- Header -->
+    <div class="dash-header">
+      <div class="dash-title">
+        <h1>My Files</h1>
+        <p>Manage and share all your uploaded files</p>
+      </div>
+      <div class="dash-actions">
+        <button class="btn btn-glass" id="btn-new-folder">📂 New Folder</button>
+        <button class="btn btn-primary" id="upload-btn">⬆️ Upload Files</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card green">
+        <div class="stat-icon green">📁</div>
+        <div class="stat-value" id="stat-files" data-counter data-target="0">0</div>
+        <div class="stat-label">Total Files</div>
+        <div class="stat-change up">↑ All your uploads</div>
+      </div>
+      <div class="stat-card diamond">
+        <div class="stat-icon diamond">💾</div>
+        <div class="stat-value"><span id="stat-storage" data-counter data-target="0">0</span><span style="font-size:1rem;font-weight:400;color:var(--text-muted)"> MB</span></div>
+        <div class="stat-label">Storage Used</div>
+        <div class="stat-change up">↑ Of 10 GB free</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-icon orange">⬇️</div>
+        <div class="stat-value" id="stat-downloads" data-counter data-target="0">0</div>
+        <div class="stat-label">Total Downloads</div>
+        <div class="stat-change up">↑ Across all files</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-icon purple">🔗</div>
+        <div class="stat-value" id="stat-shared" data-counter data-target="0">0</div>
+        <div class="stat-label">Shared Files</div>
+        <div class="stat-change up">↑ Public links</div>
+      </div>
+    </div>
+
+    <!-- Upload Zone -->
+    <div class="upload-section">
+      <div class="upload-zone" id="upload-zone">
+        <input type="file" id="upload-input" class="upload-input" multiple />
+        <div class="upload-icon">⬆️</div>
+        <div class="upload-text">
+          <h3>Drop files here to upload</h3>
+          <p>or <strong style="color:var(--green-400);cursor:pointer">click to browse</strong> — any file type, up to 2 GB per file</p>
+        </div>
+        <div class="upload-types" style="margin-top:16px">
+          <span class="upload-type">PDF</span>
+          <span class="upload-type">MP4</span>
+          <span class="upload-type">ZIP</span>
+          <span class="upload-type">Images</span>
+          <span class="upload-type">Audio</span>
+          <span class="upload-type">Docs</span>
+          <span class="upload-type">+ Any Format</span>
+        </div>
+      </div>
+      <div class="upload-progress-list" id="upload-progress-list" style="display:none"></div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="files-toolbar">
+      <div class="toolbar-left">
+        <button class="btn btn-sm btn-primary" data-filter="all" id="filter-all">All</button>
+        <button class="btn btn-sm btn-glass" data-filter="images">🖼️ Images</button>
+        <button class="btn btn-sm btn-glass" data-filter="videos">🎬 Videos</button>
+        <button class="btn btn-sm btn-glass" data-filter="documents">📄 Docs</button>
+        <button class="btn btn-sm btn-glass" data-filter="archives">🗜️ Archives</button>
+      </div>
+      <div class="toolbar-right">
+        <span id="files-count" style="color:var(--text-muted);font-size:0.85rem">0 files</span>
+        <select class="sort-select" id="sort-select">
+          <option value="date-desc">Newest First</option>
+          <option value="date-asc">Oldest First</option>
+          <option value="name-asc">Name A–Z</option>
+          <option value="name-desc">Name Z–A</option>
+          <option value="size-desc">Largest First</option>
+          <option value="size-asc">Smallest First</option>
+        </select>
+        <div class="view-toggle">
+          <button class="view-btn active" id="view-grid" title="Grid view">⊞</button>
+          <button class="view-btn" id="view-list" title="List view">☰</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bulk Action Bar -->
+    <div id="bulk-bar" style="display:none;align-items:center;gap:12px;background:var(--bg-card2);border:1px solid var(--glass-border);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:16px">
+      <span id="bulk-count" style="font-size:0.9rem;font-weight:600">0 selected</span>
+      <button class="btn btn-sm btn-glass" onclick="showToast('Download all selected','info')">⬇️ Download</button>
+      <button class="btn btn-sm btn-glass" onclick="showToast('Sharing all selected','info')">🔗 Share</button>
+      <button class="btn btn-sm btn-glass" style="color:#ef5350;border-color:rgba(239,83,80,0.3)" onclick="showToast('Bulk delete coming','info')">🗑️ Delete</button>
+      <button class="btn btn-sm btn-glass" onclick="selectedFiles.clear();renderFiles();updateBulkBar()" style="margin-left:auto">✕ Deselect</button>
+    </div>
+
+    <!-- Files Grid -->
+    <div class="files-grid" id="files-grid" style="display:grid"></div>
+
+    <!-- Files List -->
+    <div class="files-list" id="files-list" style="display:none;flex-direction:column;gap:8px"></div>
+
+  </main>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal" style="max-width:400px">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:3rem;margin-bottom:12px">🗑️</div>
+      <h3 style="font-size:1.2rem;margin-bottom:8px">Delete File?</h3>
+      <p style="color:var(--text-muted);font-size:0.9rem">You are about to permanently delete <strong id="delete-file-name"></strong>. This cannot be undone.</p>
+    </div>
+    <div style="display:flex;gap:12px">
+      <button class="btn btn-glass" id="delete-cancel" style="flex:1">Cancel</button>
+      <button class="btn btn-primary" id="delete-confirm" style="flex:1;background:linear-gradient(135deg,#ef5350,#e53935)">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- RENAME MODAL -->
+<div class="modal-overlay" id="rename-modal">
+  <div class="modal" style="max-width:400px">
+    <h3 id="rename-title" style="margin-bottom:20px">Rename File</h3>
+    <div class="form-group" style="margin-bottom:20px">
+      <label class="form-label">Name</label>
+      <input class="form-input" id="rename-input" type="text" />
+    </div>
+    <div style="display:flex;gap:12px">
+      <button class="btn btn-glass" id="rename-cancel" style="flex:1">Cancel</button>
+      <button class="btn btn-primary" id="rename-save" style="flex:1">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/db.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/dashboard.js"></script>
+<script>
+  // User dropdown
+  document.getElementById('user-menu-btn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const dd = document.getElementById('user-dropdown');
+    dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+  });
+  document.addEventListener('click', () => {
+    const dd = document.getElementById('user-dropdown');
+    if (dd) dd.style.display = 'none';
+  });
+
+  // Sidebar filter trigger
+  function triggerFilter(e, filter) {
+    e.preventDefault();
+    document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.sidebar-link[data-filter]').forEach(b => b.classList.remove('active'));
+    e.currentTarget.classList.add('active');
+    currentFilter = filter;
+    renderFiles();
+  }
+
+  // Update sidebar count
+  const origRenderStats = renderStats;
+
+  // Sidebar mobile show
+  const sidebarToggle = document.getElementById('sidebar-toggle');
+  if (window.innerWidth <= 768) {
+    sidebarToggle.style.display = 'flex';
+  }
+</script>
+</body>
+</html>

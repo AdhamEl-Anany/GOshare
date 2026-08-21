@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel – GOshare</title>
+  <meta name="description" content="GOshare Admin Dashboard – Manage users, files, and premium subscriptions." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon">💎</div>
+      <span>GOshare</span>
+    </a>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="badge badge-green" style="display:inline-flex">🔑 Admin Panel</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════ -->
+<!--  ADMIN LOGIN                      -->
+<!-- ══════════════════════════════════ -->
+<section class="admin-login-page" id="admin-login-section">
+  <div class="admin-login-card">
+    <div style="font-size:3rem;margin-bottom:16px">🔒</div>
+    <h1>Admin Access</h1>
+    <p class="subtitle">GOshare Control Panel</p>
+
+    <form class="admin-login-form" id="admin-login-form" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="admin-email">Admin Email</label>
+        <input class="form-input" type="email" id="admin-email" placeholder="admin@goshare.io" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="admin-pass">Password</label>
+        <input class="form-input" type="password" id="admin-pass" placeholder="••••••••" />
+      </div>
+      <button type="submit" class="btn btn-primary">🔑 Sign In as Admin</button>
+    </form>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ -->
+<!--  ADMIN DASHBOARD                  -->
+<!-- ══════════════════════════════════ -->
+<div class="admin-layout" id="admin-dashboard-section" style="display:none">
+
+  <!-- Header -->
+  <div class="admin-header">
+    <div>
+      <h1>⚙️ Admin Dashboard</h1>
+      <p style="color:var(--text-muted);font-size:0.9rem;margin-top:4px">Manage GOshare platform</p>
+    </div>
+    <div class="admin-user-info">
+      <span class="badge badge-green">🔑 ENG.Adham Hany</span>
+      <button class="btn btn-sm btn-glass" id="admin-logout">🚪 Logout</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="admin-stats">
+    <div class="admin-stat">
+      <span class="stat-emoji">👥</span>
+      <span class="stat-val" id="admin-stat-users">0</span>
+      <span class="stat-lbl">Total Users</span>
+    </div>
+    <div class="admin-stat">
+      <span class="stat-emoji">📁</span>
+      <span class="stat-val" id="admin-stat-files">0</span>
+      <span class="stat-lbl">Total Files</span>
+    </div>
+    <div class="admin-stat">
+      <span class="stat-emoji">💾</span>
+      <span class="stat-val" id="admin-stat-storage">0</span>
+      <span class="stat-lbl">Storage Used</span>
+    </div>
+    <div class="admin-stat">
+      <span class="stat-emoji">⬇️</span>
+      <span class="stat-val" id="admin-stat-downloads">0</span>
+      <span class="stat-lbl">Downloads</span>
+    </div>
+    <div class="admin-stat" style="border-color:rgba(255,152,0,0.3)">
+      <span class="stat-emoji">⏳</span>
+      <span class="stat-val" id="admin-stat-pending" style="color:#FF9800">0</span>
+      <span class="stat-lbl">Pending Requests</span>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="admin-tabs">
+    <button class="admin-tab active" data-panel="panel-requests">
+      ⏳ Premium Requests
+      <span class="tab-badge" id="pending-badge" style="display:none">0</span>
+    </button>
+    <button class="admin-tab" data-panel="panel-users">👥 Users</button>
+    <button class="admin-tab" data-panel="panel-files">📁 Files</button>
+  </div>
+
+  <!-- ── Requests Panel ── -->
+  <div class="admin-panel active" id="panel-requests">
+    <div id="requests-list">
+      <div style="text-align:center;padding:40px;color:var(--text-muted)">⟳ Loading…</div>
+    </div>
+  </div>
+
+  <!-- ── Users Panel ── -->
+  <div class="admin-panel" id="panel-users">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Plan</th>
+          <th>Storage</th>
+          <th>Joined</th>
+        </tr>
+      </thead>
+      <tbody id="users-table-body">
+        <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted)">⟳ Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── Files Panel ── -->
+  <div class="admin-panel" id="panel-files">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>File Name</th>
+          <th>Owner</th>
+          <th>Size</th>
+          <th>Downloads</th>
+          <th>Short Link</th>
+          <th>Uploaded</th>
+        </tr>
+      </thead>
+      <tbody id="files-table-body">
+        <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted)">⟳ Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/db.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In – GOshare</title>
+  <meta name="description" content="Log in or create a free GOshare account to start uploading and sharing files." />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .auth-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 100px 24px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Background decoration */
+    .auth-bg-glow {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .auth-bg-glow-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(0,200,83,0.12) 0%, transparent 70%);
+      top: -200px; left: -200px;
+    }
+    .auth-bg-glow-2 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(77,208,225,0.1) 0%, transparent 70%);
+      bottom: -200px; right: -150px;
+    }
+
+    .auth-container {
+      width: 100%;
+      max-width: 460px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Logo */
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .auth-logo a {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.6rem;
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .auth-logo .logo-icon {
+      width: 44px; height: 44px;
+      background: var(--grad-green);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: var(--shadow-green);
+      animation: logo-pulse 3s ease-in-out infinite;
+    }
+    .auth-logo span { background: var(--grad-hero); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+    /* Card */
+    .auth-card {
+      background: rgba(12, 26, 14, 0.8);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: 36px 36px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 60px rgba(0,200,83,0.05) inset;
+    }
+
+    /* Tabs */
+    .auth-tabs {
+      display: flex;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-md);
+      padding: 4px;
+      margin-bottom: 32px;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: var(--transition);
+      background: none;
+      border: none;
+      font-family: 'Inter', sans-serif;
+    }
+    .auth-tab.active {
+      background: var(--grad-green);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(0,200,83,0.3);
+    }
+
+    /* Panels */
+    .auth-panel { display: none; }
+    .auth-panel.active { display: block; animation: fadeInUp 0.4s ease; }
+
+    .auth-panel h2 {
+      font-size: 1.4rem;
+      margin-bottom: 6px;
+    }
+    .auth-panel .auth-subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 28px;
+    }
+
+    /* Form */
+    .auth-form { display: flex; flex-direction: column; gap: 18px; }
+
+    .pass-field {
+      position: relative;
+    }
+    .pass-field .form-input { padding-right: 44px; }
+    .pass-toggle {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      color: var(--text-muted);
+      transition: var(--transition);
+    }
+    .pass-toggle:hover { color: var(--text-primary); }
+
+    /* Password Strength */
+    .pass-strength {
+      margin-top: 8px;
+    }
+    .pass-strength-bar {
+      height: 4px;
+      background: rgba(255,255,255,0.08);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-bottom: 4px;
+    }
+    #pass-strength-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      width: 0;
+      transition: width 0.4s ease, background 0.4s ease;
+    }
+    #pass-strength-text { font-size: 0.78rem; font-weight: 600; }
+
+    /* Submit btn full width */
+    .auth-submit { width: 100%; justify-content: center; padding: 14px; font-size: 1rem; }
+
+    /* Divider */
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+      color: var(--text-dim);
+      font-size: 0.82rem;
+    }
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--bg-border);
+    }
+
+    /* Social login */
+    .social-btns { display: flex; gap: 12px; }
+    .social-btn {
+      flex: 1;
+      padding: 11px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: 'Inter', sans-serif;
+      transition: var(--transition);
+    }
+    .social-btn:hover {
+      background: rgba(255,255,255,0.08);
+      color: var(--text-primary);
+      transform: translateY(-2px);
+    }
+
+    /* Footer links */
+    .auth-footer-note {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .auth-footer-note a { color: var(--green-400); }
+
+    /* Remember / forgot */
+    .auth-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.85rem;
+    }
+    .auth-check { display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-secondary); }
+    .auth-check input[type=checkbox] { accent-color: var(--green-500); width: 16px; height: 16px; cursor: pointer; }
+    .auth-forgot { color: var(--green-400); }
+
+    /* Terms */
+    .terms-text {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: -4px;
+    }
+    .terms-text a { color: var(--green-400); }
+
+    /* Trust badges */
+    .trust-badges {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+    .trust-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-dim);
+      font-size: 0.78rem;
+    }
+
+    @keyframes shake {
+      0%,100%{transform:translateX(0)}
+      20%{transform:translateX(-8px)}
+      40%{transform:translateX(8px)}
+      60%{transform:translateX(-4px)}
+      80%{transform:translateX(4px)}
+    }
+
+    @media (max-width: 480px) {
+      .auth-card { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="auth-bg-glow auth-bg-glow-1"></div>
+<div class="auth-bg-glow auth-bg-glow-2"></div>
+
+<main class="auth-page">
+  <div class="auth-container">
+
+    <!-- Logo -->
+    <div class="auth-logo">
+      <a href="index.html">
+        <div class="logo-icon">💎</div>
+        <span>GOshare</span>
+      </a>
+    </div>
+
+    <!-- Card -->
+    <div class="auth-card">
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-panel="login-panel" id="tab-login">Sign In</button>
+        <button class="auth-tab" data-panel="register-panel" id="tab-register">Create Account</button>
+      </div>
+
+      <!-- LOGIN PANEL -->
+      <div class="auth-panel active" id="login-panel">
+        <h2>Welcome back 👋</h2>
+        <p class="auth-subtitle">Sign in to access your files</p>
+
+        <div class="social-btns">
+          <button class="social-btn" onclick="showToast('Google login coming soon!','info')">
+            🌐 Google
+          </button>
+          <button class="social-btn" onclick="showToast('GitHub login coming soon!','info')">
+            ⌂ GitHub
+          </button>
+        </div>
+
+        <div class="auth-divider">or continue with email</div>
+
+        <form class="auth-form" id="login-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="login-email">Email address</label>
+            <input class="form-input" type="email" id="login-email" placeholder="you@example.com" autocomplete="email" />
+            <span class="form-error" id="login-email-err"></span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="login-pass">Password</label>
+            <div class="pass-field">
+              <input class="form-input" type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" />
+              <button type="button" class="pass-toggle">👁️</button>
+            </div>
+            <span class="form-error" id="login-pass-err"></span>
+          </div>
+
+          <div class="auth-row">
+            <label class="auth-check">
+              <input type="checkbox" id="remember-me" /> Remember me
+            </label>
+            <a href="#" class="auth-forgot">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="btn btn-primary auth-submit" id="login-submit">
+            Sign In →
+          </button>
+
+          <p style="text-align:center;font-size:0.82rem;color:var(--text-dim)">
+            Demo: <strong style="color:var(--green-400)">demo@goshare.io</strong> / <strong style="color:var(--green-400)">demo123</strong>
+          </p>
+        </form>
+      </div>
+
+      <!-- REGISTER PANEL -->
+      <div class="auth-panel" id="register-panel">
+        <h2>Start for free 🚀</h2>
+        <p class="auth-subtitle">Get 10 GB storage, no credit card needed</p>
+
+        <form class="auth-form" id="register-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="reg-name">Full Name</label>
+            <input class="form-input" type="text" id="reg-name" placeholder="John Doe" autocomplete="name" />
+            <span class="form-error" id="reg-name-err"></span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-email">Email address</label>
+            <input class="form-input" type="email" id="reg-email" placeholder="you@example.com" autocomplete="email" />
+            <span class="form-error" id="reg-email-err"></span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-pass">Password</label>
+            <div class="pass-field">
+              <input class="form-input" type="password" id="reg-pass" placeholder="Min. 6 characters" autocomplete="new-password" />
+              <button type="button" class="pass-toggle">👁️</button>
+            </div>
+            <span class="form-error" id="reg-pass-err"></span>
+            <div class="pass-strength">
+              <div class="pass-strength-bar">
+                <div id="pass-strength-fill"></div>
+              </div>
+              <span id="pass-strength-text"></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-confirm">Confirm Password</label>
+            <div class="pass-field">
+              <input class="form-input" type="password" id="reg-confirm" placeholder="Repeat password" autocomplete="new-password" />
+              <button type="button" class="pass-toggle">👁️</button>
+            </div>
+            <span class="form-error" id="reg-confirm-err"></span>
+          </div>
+
+          <button type="submit" class="btn btn-primary auth-submit" id="register-submit">
+            Create Free Account →
+          </button>
+
+          <p class="terms-text">
+            By signing up, you agree to our
+            <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.
+          </p>
+        </form>
+      </div>
+
+    </div><!-- /auth-card -->
+
+    <!-- Trust badges -->
+    <div class="trust-badges">
+      <span class="trust-badge">🔒 SSL Encrypted</span>
+      <span class="trust-badge">☁️ 10 GB Free</span>
+      <span class="trust-badge">🚫 No Ads</span>
+    </div>
+
+  </div>
+</main>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/db.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+</body>
+</html>
