@@ -3,10 +3,18 @@
    =========================== */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // If already logged in, redirect
+  // Check auth state
   auth.onAuthStateChanged(async (user) => {
-    if (user) {
-      window.location.href = 'dashboard.html';
+    const params = new URLSearchParams(window.location.search);
+    const isLogout = params.get('logout') === 'true' || params.get('switch') === 'true';
+
+    if (isLogout && user) {
+      await auth.signOut();
+      return;
+    }
+
+    if (user && !isLogout) {
+      renderActiveSessionBanner(user);
     }
   });
 
@@ -157,6 +165,43 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// ── Active Session Chooser Banner ──
+function renderActiveSessionBanner(user) {
+  const card = document.querySelector('.auth-card');
+  if (!card || document.getElementById('active-session-banner')) return;
+
+  const banner = document.createElement('div');
+  banner.id = 'active-session-banner';
+  banner.style.cssText = `
+    background: rgba(0, 200, 83, 0.12);
+    border: 1px solid var(--green-500);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-bottom: 20px;
+    text-align: center;
+  `;
+  banner.innerHTML = `
+    <p style="font-size:0.9rem;margin-bottom:12px;color:var(--text-primary)">
+      Logged in as: <strong style="color:var(--green-400)">${user.email}</strong>
+    </p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <a href="${user.email === ADMIN_EMAIL ? 'admin.html' : 'dashboard.html'}" class="btn btn-sm btn-primary">
+        🚀 Continue as ${user.displayName || user.email.split('@')[0]}
+      </a>
+      <button type="button" class="btn btn-sm btn-glass" onclick="switchAccount()" style="color:#ef5350;border-color:rgba(239,83,80,0.3)">
+        🔄 Switch Account / Log Out
+      </button>
+    </div>
+  `;
+  card.insertBefore(banner, card.firstChild);
+}
+
+async function switchAccount() {
+  await auth.signOut();
+  document.getElementById('active-session-banner')?.remove();
+  showToast('Logged out. Select or log in with another account.', 'info');
+}
+
 // ── Helpers ──
 function validateEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -220,12 +265,13 @@ function updatePasswordStrength(pass) {
 }
 
 // ────────────────────────────────────
-//  SOCIAL AUTHENTICATION (Google & GitHub)
+//  SOCIAL AUTHENTICATION (Google & GitHub with Account Selection)
 // ────────────────────────────────────
 
 async function loginWithGoogle() {
   try {
     const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
     const cred = await auth.signInWithPopup(provider);
     const user = cred.user;
 
@@ -241,7 +287,7 @@ async function loginWithGoogle() {
     }
 
     showToast(`Welcome, ${user.displayName || 'User'}! 🎉`, 'success');
-    setTimeout(() => window.location.href = 'dashboard.html', 800);
+    setTimeout(() => window.location.href = user.email === ADMIN_EMAIL ? 'admin.html' : 'dashboard.html', 800);
   } catch (error) {
     console.error('Google Auth Error:', error);
     if (error.code === 'auth/popup-closed-by-user') return;
@@ -256,6 +302,7 @@ async function loginWithGoogle() {
 async function loginWithGithub() {
   try {
     const provider = new firebase.auth.GithubAuthProvider();
+    provider.setCustomParameters({ prompt: 'consent' });
     const cred = await auth.signInWithPopup(provider);
     const user = cred.user;
 
@@ -271,7 +318,7 @@ async function loginWithGithub() {
     }
 
     showToast(`Welcome, ${user.displayName || 'User'}! 🎉`, 'success');
-    setTimeout(() => window.location.href = 'dashboard.html', 800);
+    setTimeout(() => window.location.href = user.email === ADMIN_EMAIL ? 'admin.html' : 'dashboard.html', 800);
   } catch (error) {
     console.error('GitHub Auth Error:', error);
     if (error.code === 'auth/popup-closed-by-user') return;

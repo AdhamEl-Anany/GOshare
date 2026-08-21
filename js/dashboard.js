@@ -570,5 +570,5 @@ function debounce(fn, delay) {
 // Logout
 document.getElementById('logout-btn')?.addEventListener('click', async () => {
   await auth.signOut();
-  window.location.href = 'index.html';
+  window.location.href = 'auth.html?logout=true';
 });
