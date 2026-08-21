@@ -199,3 +199,67 @@ function updatePasswordStrength(pass) {
   text.textContent = level.label;
   text.style.color = level.color;
 }
+
+// ────────────────────────────────────
+//  SOCIAL AUTHENTICATION (Google & GitHub)
+// ────────────────────────────────────
+
+async function loginWithGoogle() {
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    const cred = await auth.signInWithPopup(provider);
+    const user = cred.user;
+
+    // Create user doc if missing
+    let userDoc = await getUserDoc(user.uid);
+    if (!userDoc) {
+      await createUserDoc(user.uid, {
+        name: user.displayName || user.email.split('@')[0],
+        email: user.email,
+        plan: 'free',
+        role: user.email === ADMIN_EMAIL ? 'admin' : 'user'
+      });
+    }
+
+    showToast(`Welcome, ${user.displayName || 'User'}! 🎉`, 'success');
+    setTimeout(() => window.location.href = 'dashboard.html', 800);
+  } catch (error) {
+    console.error('Google Auth Error:', error);
+    if (error.code === 'auth/popup-closed-by-user') return;
+    if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
+      showToast('Please enable Google Sign-In in Firebase Console ➔ Authentication ➔ Sign-in method', 'error');
+    } else {
+      showToast(`Google login: ${error.message}`, 'error');
+    }
+  }
+}
+
+async function loginWithGithub() {
+  try {
+    const provider = new firebase.auth.GithubAuthProvider();
+    const cred = await auth.signInWithPopup(provider);
+    const user = cred.user;
+
+    // Create user doc if missing
+    let userDoc = await getUserDoc(user.uid);
+    if (!userDoc) {
+      await createUserDoc(user.uid, {
+        name: user.displayName || user.email.split('@')[0],
+        email: user.email,
+        plan: 'free',
+        role: user.email === ADMIN_EMAIL ? 'admin' : 'user'
+      });
+    }
+
+    showToast(`Welcome, ${user.displayName || 'User'}! 🎉`, 'success');
+    setTimeout(() => window.location.href = 'dashboard.html', 800);
+  } catch (error) {
+    console.error('GitHub Auth Error:', error);
+    if (error.code === 'auth/popup-closed-by-user') return;
+    if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
+      showToast('Please enable GitHub Sign-In in Firebase Console ➔ Authentication ➔ Sign-in method', 'error');
+    } else {
+      showToast(`GitHub login: ${error.message}`, 'error');
+    }
+  }
+}

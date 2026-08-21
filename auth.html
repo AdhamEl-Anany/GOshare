@@ -295,10 +295,10 @@
         <p class="auth-subtitle">Sign in to access your files</p>
 
         <div class="social-btns">
-          <button class="social-btn" onclick="showToast('Google login coming soon!','info')">
+          <button class="social-btn" type="button" onclick="loginWithGoogle()">
             🌐 Google
           </button>
-          <button class="social-btn" onclick="showToast('GitHub login coming soon!','info')">
+          <button class="social-btn" type="button" onclick="loginWithGithub()">
             ⌂ GitHub
           </button>
         </div>
@@ -342,6 +342,17 @@
       <div class="auth-panel" id="register-panel">
         <h2>Start for free 🚀</h2>
         <p class="auth-subtitle">Get 10 GB storage, no credit card needed</p>
+
+        <div class="social-btns" style="margin-bottom:16px">
+          <button class="social-btn" type="button" onclick="loginWithGoogle()">
+            🌐 Google
+          </button>
+          <button class="social-btn" type="button" onclick="loginWithGithub()">
+            ⌂ GitHub
+          </button>
+        </div>
+
+        <div class="auth-divider">or register with email</div>
 
         <form class="auth-form" id="register-form" novalidate>
           <div class="form-group">
