@@ -27,11 +27,11 @@
 
 ---
 
-## 🔑 Admin Credentials
+## 🔑 Admin Access
 
 Access the control panel at [`admin.html`](admin.html):
-- **Email**: `adham.cs.guides@gmail.com`
-- **Password**: `toqa1402`
+- **Admin Email**: `adham.cs.guides@gmail.com`
+- *(Admin credentials are fully protected and accessible via admin panel)*
 
 ---
 
