@@ -21,25 +21,6 @@ function showAdminLogin() {
   document.getElementById('admin-login-section').style.display = 'flex';
   document.getElementById('admin-dashboard-section').style.display = 'none';
 
-  // Google Sign-In for Admin
-  document.getElementById('admin-google-btn')?.addEventListener('click', async () => {
-    try {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      const res = await auth.signInWithPopup(provider);
-      if (res.user && res.user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-        adminUser = res.user;
-        showToast('Welcome Admin! 🔑', 'success');
-        showAdminDashboard();
-      } else {
-        await auth.signOut();
-        showToast('Access denied: Your Google account is not authorized as Admin', 'error');
-      }
-    } catch (err) {
-      console.error('Admin Google sign in error:', err);
-      showToast('Google Sign-In failed: ' + err.message, 'error');
-    }
-  });
-
   const form = document.getElementById('admin-login-form');
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
