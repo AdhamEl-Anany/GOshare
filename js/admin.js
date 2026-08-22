@@ -2,13 +2,12 @@
    GOshare – Admin Panel Logic
    =========================== */
 
-const ADMIN_PASS = 'toqa1402';
 let adminUser = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   // Check if already logged in as admin
   auth.onAuthStateChanged(async (user) => {
-    if (user && user.email === ADMIN_EMAIL) {
+    if (user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
       adminUser = user;
       showAdminDashboard();
     } else {
@@ -30,12 +29,7 @@ function showAdminLogin() {
     const btn   = form.querySelector('[type=submit]');
 
     if (email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
-      showToast('Not an admin email', 'error');
-      return;
-    }
-
-    if (pass !== ADMIN_PASS) {
-      showToast('Incorrect Admin password', 'error');
+      showToast('Access denied: Email is not authorized for Admin access', 'error');
       return;
     }
 
@@ -43,35 +37,15 @@ function showAdminLogin() {
     btn.innerHTML = '⟳ Verifying…';
 
     try {
-      // 1. Try to sign in
       await auth.signInWithEmailAndPassword(email, pass);
       adminUser = auth.currentUser;
       showToast('Welcome Admin! 🔑', 'success');
       showAdminDashboard();
     } catch (error) {
-      console.log('Admin login attempt error:', error.code);
-
-      // 2. Try to create account if doesn't exist
-      try {
-        const cred = await auth.createUserWithEmailAndPassword(email, pass);
-        await cred.user.updateProfile({ displayName: 'ENG.Adham Hany' });
-        await createUserDoc(cred.user.uid, {
-          name: 'ENG.Adham Hany',
-          email: email,
-          plan: 'business',
-          role: 'admin'
-        });
-        adminUser = cred.user;
-        showToast('Admin account initialized & logged in! 🔑', 'success');
-        showAdminDashboard();
-        return;
-      } catch (createErr) {
-        console.log('Admin create attempt notice:', createErr.code);
-      }
-
-      // 3. Fallback: If Firebase blocks due to too-many-requests or credentials, allow Admin access since password matches
-      showToast('Welcome Admin! 🔑', 'success');
-      showAdminDashboard();
+      btn.disabled = false;
+      btn.innerHTML = 'Sign In to Admin Panel →';
+      console.error('Admin login authentication failed:', error.message);
+      showToast('Authentication failed: ' + error.message, 'error');
     }
   });
 }
@@ -105,8 +79,13 @@ async function showAdminDashboard() {
 
   // Logout
   document.getElementById('admin-logout')?.addEventListener('click', async () => {
-    await auth.signOut();
-    window.location.reload();
+    if (typeof globalLogout === 'function') {
+      await globalLogout('index.html');
+    } else {
+      await auth.signOut();
+      localStorage.removeItem('goshare_user');
+      window.location.reload();
+    }
   });
 }
 
@@ -155,7 +134,9 @@ async function loadRequestsTab() {
 
     container.innerHTML = requests.map(r => {
       const date = r.requestedAt?.toDate ? r.requestedAt.toDate().toLocaleDateString() : '—';
-      const initial = (r.userName || r.userEmail || '?').charAt(0).toUpperCase();
+      const initial = escapeHTML((r.userName || r.userEmail || '?').charAt(0).toUpperCase());
+      const safeName = escapeHTML(r.userName || 'Unknown');
+      const safeEmail = escapeHTML(r.userEmail || '—');
 
       let statusHtml = '';
       let actionsHtml = '';
@@ -163,8 +144,8 @@ async function loadRequestsTab() {
       if (r.status === 'pending') {
         statusHtml = `<span class="req-status pending">⏳ Pending</span>`;
         actionsHtml = `
-          <button class="btn btn-sm btn-primary" onclick="handleApprove('${r.id}','${r.userId}','${r.plan}')">✅ Approve</button>
-          <button class="btn btn-sm btn-glass" style="color:#ef5350" onclick="handleReject('${r.id}')">❌ Reject</button>
+          <button class="btn btn-sm btn-primary" onclick="handleApprove('${escapeHTML(r.id)}','${escapeHTML(r.userId)}','${escapeHTML(r.plan)}')">✅ Approve</button>
+          <button class="btn btn-sm btn-glass" style="color:#ef5350" onclick="handleReject('${escapeHTML(r.id)}')">❌ Reject</button>
         `;
       } else if (r.status === 'approved') {
         statusHtml = `<span class="req-status approved">✅ Approved</span>`;
@@ -176,25 +157,25 @@ async function loadRequestsTab() {
         <div class="request-card">
           <div class="req-avatar">${initial}</div>
           <div class="req-info">
-            <div class="req-name">${r.userName || 'Unknown'}</div>
-            <div class="req-email">${r.userEmail}</div>
+            <div class="req-name">${safeName}</div>
+            <div class="req-email">${safeEmail}</div>
           </div>
-          <span class="req-plan ${r.plan}">${r.plan === 'pro' ? '💎 Pro' : '🏢 Business'}</span>
-          <span class="req-date">${date}</span>
+          <span class="req-plan ${escapeHTML(r.plan)}">${r.plan === 'pro' ? '💎 Pro' : '🏢 Business'}</span>
+          <span class="req-date">${escapeHTML(date)}</span>
           ${statusHtml}
           <div class="req-actions">${actionsHtml}</div>
         </div>
       `;
     }).join('');
   } catch (e) {
-    container.innerHTML = `<div class="admin-empty"><p>Error loading requests: ${e.message}</p></div>`;
+    container.innerHTML = `<div class="admin-empty"><p>Error loading requests: ${escapeHTML(e.message)}</p></div>`;
   }
 }
 
 async function handleApprove(requestId, userId, plan) {
   try {
     await approveRequest(requestId, userId, plan);
-    showToast(`✅ User upgraded to ${plan}!`, 'success');
+    showToast(`✅ User upgraded to ${escapeHTML(plan)}!`, 'success');
     await loadAdminStats();
     await loadRequestsTab();
   } catch (e) {
@@ -230,18 +211,21 @@ async function loadUsersTab() {
 
     container.innerHTML = users.map(u => {
       const date = u.createdAt?.toDate ? u.createdAt.toDate().toLocaleDateString() : '—';
+      const safeName = escapeHTML(u.name || '—');
+      const safeEmail = escapeHTML(u.email || '—');
+      const safePlan = escapeHTML(u.plan || 'free');
       return `
         <tr>
-          <td><strong>${u.name || '—'}</strong></td>
-          <td>${u.email}</td>
-          <td><span class="user-plan ${u.plan || 'free'}">${(u.plan || 'free').toUpperCase()}</span></td>
+          <td><strong>${safeName}</strong></td>
+          <td>${safeEmail}</td>
+          <td><span class="user-plan ${safePlan}">${safePlan.toUpperCase()}</span></td>
           <td>${formatSize(u.storageUsed || 0)}</td>
-          <td>${date}</td>
+          <td>${escapeHTML(date)}</td>
         </tr>
       `;
     }).join('');
   } catch (e) {
-    container.innerHTML = `<tr><td colspan="5" class="admin-empty">Error: ${e.message}</td></tr>`;
+    container.innerHTML = `<tr><td colspan="5" class="admin-empty">Error: ${escapeHTML(e.message)}</td></tr>`;
   }
 }
 
@@ -262,19 +246,21 @@ async function loadFilesTab() {
 
     container.innerHTML = files.map(f => {
       const date = f.createdAt?.toDate ? f.createdAt.toDate().toLocaleDateString() : '—';
-      const shortLink = f.shortId ? `file.html?s=${f.shortId}` : '—';
+      const safeFileName = escapeHTML(f.name || 'File');
+      const safeEmail = escapeHTML(f.ownerEmail || '—');
+      const shortLink = f.shortId ? `file.html?s=${escapeHTML(f.shortId)}` : '—';
       return `
         <tr>
-          <td>${getFileIcon(f.name)} ${f.name}</td>
-          <td>${f.ownerEmail || '—'}</td>
+          <td>${getFileIcon(f.name)} ${safeFileName}</td>
+          <td>${safeEmail}</td>
           <td>${formatSize(f.size || 0)}</td>
           <td>${f.downloads || 0}</td>
           <td><code style="font-size:0.8rem;color:var(--green-400)">${shortLink}</code></td>
-          <td>${date}</td>
+          <td>${escapeHTML(date)}</td>
         </tr>
       `;
     }).join('');
   } catch (e) {
-    container.innerHTML = `<tr><td colspan="6" class="admin-empty">Error: ${e.message}</td></tr>`;
+    container.innerHTML = `<tr><td colspan="6" class="admin-empty">Error: ${escapeHTML(e.message)}</td></tr>`;
   }
 }

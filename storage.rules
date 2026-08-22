@@ -1,0 +1,29 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.email.lower() == 'adham.cs.guides@gmail.com';
+    }
+
+    // Uploads path: /uploads/{userId}/{fileName}
+    match /uploads/{userId}/{allPaths=**} {
+      allow read: if true; // Public file access for shared downloads
+      allow write: if isOwner(userId) || isAdmin();
+      allow delete: if isOwner(userId) || isAdmin();
+    }
+
+    // Default deny for everything else
+    match /{allPaths=**} {
+      allow read, write: if isAdmin();
+    }
+  }
+}

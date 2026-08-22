@@ -147,11 +147,18 @@ async function incrementDownloads(fileId) {
 //  SHORT LINK OPERATIONS
 // ────────────────────────────────────
 
-function generateShortId(length = 6) {
+// ── Cryptographically Secure High-Entropy Short ID Generator ──
+function generateShortId(length = 10) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const bytes = new Uint8Array(length);
+  if (window.crypto && window.crypto.getRandomValues) {
+    window.crypto.getRandomValues(bytes);
+  } else {
+    for (let i = 0; i < length; i++) bytes[i] = Math.floor(Math.random() * 256);
+  }
   let result = '';
   for (let i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
+    result += chars.charAt(bytes[i] % chars.length);
   }
   return result;
 }

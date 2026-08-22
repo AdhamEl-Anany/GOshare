@@ -221,18 +221,23 @@ function renderGrid(files) {
     return;
   }
 
-  grid.innerHTML = files.map(f => `
-    <div class="file-card ${selectedFiles.has(f.id) ? 'selected' : ''}" data-id="${f.id}" onclick="handleFileClick(event,'${f.id}','${f.shortId || ''}')">
-      <div class="file-card-checkbox" onclick="toggleSelect(event,'${f.id}')">
-        ${selectedFiles.has(f.id) ? '✓' : ''}
+  grid.innerHTML = files.map(f => {
+    const safeName = escapeHTML(f.name);
+    const safeId = escapeHTML(f.id);
+    const safeShortId = escapeHTML(f.shortId || '');
+    return `
+      <div class="file-card ${selectedFiles.has(f.id) ? 'selected' : ''}" data-id="${safeId}" onclick="handleFileClick(event,'${safeId}','${safeShortId}')">
+        <div class="file-card-checkbox" onclick="toggleSelect(event,'${safeId}')">
+          ${selectedFiles.has(f.id) ? '✓' : ''}
+        </div>
+        <div class="file-card-menu" onclick="openContextMenu(event.clientX,event.clientY,'${safeId}',event)">⋮</div>
+        <span class="file-card-icon">${getFileIcon(f.name)}</span>
+        <div class="file-card-name" title="${safeName}">${safeName}</div>
+        <div class="file-card-meta">${formatSize(f.size || 0)}</div>
+        <div class="file-card-meta">${escapeHTML(getFileDate(f))}</div>
       </div>
-      <div class="file-card-menu" onclick="openContextMenu(event.clientX,event.clientY,'${f.id}',event)">⋮</div>
-      <span class="file-card-icon">${getFileIcon(f.name)}</span>
-      <div class="file-card-name" title="${f.name}">${f.name}</div>
-      <div class="file-card-meta">${formatSize(f.size || 0)}</div>
-      <div class="file-card-meta">${getFileDate(f)}</div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 function renderList(files) {
@@ -246,19 +251,23 @@ function renderList(files) {
     return;
   }
 
-  list.innerHTML = files.map(f => `
-    <div class="file-list-item" data-id="${f.id}">
-      <span class="file-list-icon">${getFileIcon(f.name)}</span>
-      <span class="file-list-name" title="${f.name}">${f.name}</span>
-      <span class="file-list-size">${formatSize(f.size || 0)}</span>
-      <span class="file-list-date">${getFileDate(f)}</span>
-      <div class="file-list-actions">
-        <button class="btn btn-sm btn-glass btn-icon" title="Share" onclick="shareFile('${f.id}')">🔗</button>
-        <button class="btn btn-sm btn-glass btn-icon" title="Download" onclick="downloadFile('${f.id}')">⬇️</button>
-        <button class="btn btn-sm btn-glass btn-icon" title="Delete" onclick="deleteFile('${f.id}')">🗑️</button>
+  list.innerHTML = files.map(f => {
+    const safeName = escapeHTML(f.name);
+    const safeId = escapeHTML(f.id);
+    return `
+      <div class="file-list-item" data-id="${safeId}">
+        <span class="file-list-icon">${getFileIcon(f.name)}</span>
+        <span class="file-list-name" title="${safeName}">${safeName}</span>
+        <span class="file-list-size">${formatSize(f.size || 0)}</span>
+        <span class="file-list-date">${escapeHTML(getFileDate(f))}</span>
+        <div class="file-list-actions">
+          <button class="btn btn-sm btn-glass btn-icon" title="Share" onclick="shareFile('${safeId}')">🔗</button>
+          <button class="btn btn-sm btn-glass btn-icon" title="Download" onclick="downloadFile('${safeId}')">⬇️</button>
+          <button class="btn btn-sm btn-glass btn-icon" title="Delete" onclick="deleteFile('${safeId}')">🗑️</button>
+        </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 function switchView(view) {
@@ -318,12 +327,13 @@ function openContextMenu(x, y, id, e) {
   const menu = document.createElement('div');
   menu.id = 'context-menu';
   menu.className = 'context-menu';
+  const safeId = escapeHTML(id);
   menu.innerHTML = `
-    <div class="context-menu-item" onclick="shareFile('${id}')">🔗 &nbsp; Copy Share Link</div>
-    <div class="context-menu-item" onclick="downloadFile('${id}')">⬇️ &nbsp; Download</div>
-    <div class="context-menu-item" onclick="openRenameModal('${id}')">✏️ &nbsp; Rename</div>
+    <div class="context-menu-item" onclick="shareFile('${safeId}')">🔗 &nbsp; Copy Share Link</div>
+    <div class="context-menu-item" onclick="downloadFile('${safeId}')">⬇️ &nbsp; Download</div>
+    <div class="context-menu-item" onclick="openRenameModal('${safeId}')">✏️ &nbsp; Rename</div>
     <div class="context-menu-divider"></div>
-    <div class="context-menu-item danger" onclick="deleteFile('${id}')">🗑️ &nbsp; Delete</div>
+    <div class="context-menu-item danger" onclick="deleteFile('${safeId}')">🗑️ &nbsp; Delete</div>
   `;
   document.body.appendChild(menu);
 
@@ -358,7 +368,7 @@ function downloadFile(id) {
   a.click();
   // Increment download counter
   incrementDownloads(id).catch(() => {});
-  showToast(`Downloading "${file.name}"…`, 'info');
+  showToast(`Downloading "${escapeHTML(file.name)}"…`, 'info');
   closeContextMenu();
 }
 
@@ -432,7 +442,7 @@ function openRenameModal(id, isFolder = false) {
         showToast('Rename failed: ' + e.message, 'error');
       }
     } else {
-      showToast(`Folder "${newName}" created`, 'success');
+      showToast(`Folder "${escapeHTML(newName)}" created`, 'success');
     }
     overlay.classList.remove('active');
   };
@@ -489,10 +499,21 @@ async function handleFilesUpload(files) {
     return;
   }
 
+  // 2. Plan Size Limits Check
+  const planName = (currentUserDoc?.plan || 'free').toLowerCase();
+  const planSizeLimits = { free: 2 * 1024 * 1024 * 1024, pro: 20 * 1024 * 1024 * 1024, business: Infinity };
+  const maxAllowedFileSize = planSizeLimits[planName] || planSizeLimits.free;
+
   list.style.display = 'flex';
 
   for (const file of files) {
-    // 2. Dangerous Malware & Executable Script Filter
+    // 3. Size limit per file
+    if (file.size > maxAllowedFileSize) {
+      showToast(`🚫 File size exceeds maximum allowed limit (${formatSize(maxAllowedFileSize)}) for your ${planName.toUpperCase()} plan.`, 'error');
+      continue;
+    }
+
+    // 4. Dangerous Malware & Executable Script Filter
     const ext = file.name.split('.').pop().toLowerCase();
     if (BLOCKED_EXTENSIONS.includes(ext)) {
       showToast(`🚫 Blocked: Executable files (.${ext}) are prohibited for platform security.`, 'error');
@@ -502,12 +523,13 @@ async function handleFilesUpload(files) {
     window.userUploadHistory.push(Date.now());
 
     const itemId = 'u' + Date.now() + Math.random().toString(36).slice(2, 6);
+    const safeFileName = escapeHTML(file.name);
     const item = document.createElement('div');
     item.className = 'upload-progress-item';
     item.innerHTML = `
       <span class="upload-file-icon">${getFileIcon(file.name)}</span>
       <div class="upload-file-info">
-        <div class="upload-file-name">${file.name}</div>
+        <div class="upload-file-name">${safeFileName}</div>
         <div class="upload-file-size">${formatSize(file.size)}</div>
         <div class="progress-bar upload-file-progress">
           <div class="progress-fill" id="pf-${itemId}" style="width:0%"></div>
@@ -518,7 +540,7 @@ async function handleFilesUpload(files) {
     list.appendChild(item);
 
     try {
-      // Upload to Firebase Storage
+      // Upload directly to Firebase Storage
       const { downloadUrl, storagePath } = await uploadFileToStorage(
         currentUser.uid,
         file,
@@ -528,7 +550,7 @@ async function handleFilesUpload(files) {
         }
       );
 
-      // Generate short link
+      // Generate secure short link
       const shortId = generateShortId();
 
       // Save file metadata in Firestore
@@ -552,7 +574,7 @@ async function handleFilesUpload(files) {
       // Update UI
       item.querySelector(`#pp-${itemId}`).textContent = '✅';
       item.querySelector(`#pf-${itemId}`).style.background = 'var(--green-400)';
-      showToast(`"${file.name}" uploaded!`, 'success');
+      showToast(`"${safeFileName}" uploaded!`, 'success');
 
       // Reload files
       await loadFiles();
@@ -566,7 +588,7 @@ async function handleFilesUpload(files) {
     } catch (e) {
       console.error('Upload error:', e);
       item.querySelector(`#pp-${itemId}`).textContent = '❌';
-      showToast(`Upload failed: ${e.message}`, 'error');
+      showToast(`Upload failed: ${escapeHTML(e.message)}`, 'error');
     }
   }
 }
@@ -592,6 +614,11 @@ function debounce(fn, delay) {
 
 // Logout
 document.getElementById('logout-btn')?.addEventListener('click', async () => {
-  await auth.signOut();
-  window.location.href = 'auth.html?logout=true';
+  if (typeof globalLogout === 'function') {
+    await globalLogout('auth.html?logout=true');
+  } else {
+    await auth.signOut();
+    localStorage.removeItem('goshare_user');
+    window.location.href = 'auth.html?logout=true';
+  }
 });

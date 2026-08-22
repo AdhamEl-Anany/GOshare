@@ -3,6 +3,30 @@
    (Shared across all pages)
    =========================== */
 
+// ── HTML Security Escaper (XSS Protection) ──
+function escapeHTML(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// ── Secure Global Logout ──
+async function globalLogout(redirect = 'index.html') {
+  try {
+    if (typeof auth !== 'undefined' && auth) {
+      await auth.signOut();
+    }
+  } catch (e) {
+    console.warn('Signout notice:', e);
+  }
+  localStorage.removeItem('goshare_user');
+  window.location.href = redirect;
+}
+
 // ── Toast Notifications ──
 function createToastContainer() {
   let c = document.getElementById('toast-container');

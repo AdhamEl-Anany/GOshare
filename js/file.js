@@ -170,7 +170,7 @@ function startDownload(file) {
 
       btn.innerHTML = '✅ Downloaded!';
       btn.style.background = 'var(--grad-green)';
-      showToast(`"${file.name}" download started!`, 'success');
+      showToast(`"${escapeHTML(file.name)}" download started!`, 'success');
 
       setTimeout(() => {
         btn.disabled = false;

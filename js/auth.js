@@ -62,44 +62,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
       setLoading(btn, true);
 
-      // Special Admin Login Handling
-      if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-        if (password !== 'toqa1402') {
-          setLoading(btn, false);
-          showFieldError('login-pass-err', 'Incorrect Admin password');
-          shakeForm(loginForm);
-          return;
-        }
-
-        try {
-          await auth.signInWithEmailAndPassword(email, password);
-        } catch (err) {
-          if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-            try {
-              const cred = await auth.createUserWithEmailAndPassword(email, password);
-              await cred.user.updateProfile({ displayName: 'ENG.Adham Hany' });
-              await createUserDoc(cred.user.uid, {
-                name: 'ENG.Adham Hany',
-                email: email,
-                plan: 'business',
-                role: 'admin'
-              });
-            } catch (cErr) {
-              console.warn('Admin account creation notice:', cErr);
-            }
-          }
-        }
-
-        showToast('Welcome Admin! Redirecting to Admin Panel… 🔑', 'success');
-        setTimeout(() => window.location.href = 'admin.html', 800);
-        return;
-      }
-
-      // Normal User Login
+      // Unified Secure User & Admin Login
       try {
-        await auth.signInWithEmailAndPassword(email, password);
-        showToast('Welcome back! Redirecting…', 'success');
-        setTimeout(() => window.location.href = 'dashboard.html', 800);
+        const cred = await auth.signInWithEmailAndPassword(email, password);
+        const loggedUser = cred.user;
+        const isAdmin = loggedUser.email && loggedUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+
+        localStorage.setItem('goshare_user', JSON.stringify({
+          uid: loggedUser.uid,
+          email: loggedUser.email,
+          name: loggedUser.displayName || loggedUser.email.split('@')[0]
+        }));
+
+        if (isAdmin) {
+          showToast('Welcome Admin! Redirecting to Admin Panel… 🔑', 'success');
+          setTimeout(() => window.location.href = 'admin.html', 800);
+        } else {
+          showToast('Welcome back! Redirecting…', 'success');
+          setTimeout(() => window.location.href = 'dashboard.html', 800);
+        }
       } catch (error) {
         setLoading(btn, false);
         let msg = 'Invalid email or password';
