@@ -147,9 +147,8 @@ function startDownload(file) {
   // Increment download count in Firestore
   incrementDownloads(file.id).catch(() => {});
 
-  // Simulate progress then redirect to actual download
   let pct = 0;
-  const interval = setInterval(() => {
+  const interval = setInterval(async () => {
     pct += Math.random() * 20 + 10;
     if (pct >= 100) {
       pct = 100;
@@ -159,10 +158,20 @@ function startDownload(file) {
       if (progressText) progressText.textContent = '100%';
       if (statusText)   statusText.textContent = 'Download ready!';
 
-      // Open the actual Firebase Storage download URL
+      let targetUrl = file.downloadUrl;
+      if (file.storagePath && file.storagePath.startsWith('idb:')) {
+        const key = file.storagePath.replace('idb:', '');
+        if (typeof getIndexedDBFile === 'function') {
+          const blob = await getIndexedDBFile(key);
+          if (blob) {
+            targetUrl = URL.createObjectURL(blob);
+          }
+        }
+      }
+
+      // Open download URL or trigger direct save
       const a = document.createElement('a');
-      a.href = file.downloadUrl;
-      a.target = '_blank';
+      a.href = targetUrl;
       a.download = file.name;
       document.body.appendChild(a);
       a.click();

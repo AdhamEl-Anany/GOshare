@@ -265,61 +265,29 @@ async function rejectRequest(requestId) {
 //  FIREBASE STORAGE OPERATIONS (Instant Progress & Fail-Safe)
 // ────────────────────────────────────
 
-function uploadFileToStorage(uid, file, onProgress) {
-  return new Promise((resolve) => {
-    if (onProgress) onProgress(15);
-    const reader = new FileReader();
-
-    reader.onprogress = (e) => {
-      if (e.lengthComputable && onProgress) {
-        const pct = Math.min(90, Math.round((e.loaded / e.total) * 100));
-        onProgress(pct);
-      }
-    };
-
-    reader.onload = async (e) => {
-      const dataUrl = e.target.result;
-      if (onProgress) onProgress(100);
-
-      try {
-        const storagePath = `uploads/${uid}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-        const ref = storage.ref(storagePath);
-        const uploadTask = ref.put(file);
-
-        let timer = setTimeout(() => {
-          console.warn('Storage slow/locked, resolving with instant DataURL fallback');
-          resolve({ downloadUrl: dataUrl, storagePath: '' });
-        }, 2000);
-
-        uploadTask.then(async (snapshot) => {
-          clearTimeout(timer);
-          try {
-            const downloadUrl = await snapshot.ref.getDownloadURL();
-            resolve({ downloadUrl, storagePath });
-          } catch (e) {
-            resolve({ downloadUrl: dataUrl, storagePath: '' });
-          }
-        }).catch(() => {
-          clearTimeout(timer);
-          resolve({ downloadUrl: dataUrl, storagePath: '' });
-        });
-      } catch (err) {
-        resolve({ downloadUrl: dataUrl, storagePath: '' });
-      }
-    };
-
-    reader.onerror = () => {
-      resolve({ downloadUrl: '', storagePath: '' });
-    };
-
-    reader.readAsDataURL(file);
-  });
+async function uploadFileToStorage(uid, file, onProgress) {
+  if (typeof uploadFileCloud === 'function') {
+    return await uploadFileCloud(uid, file, onProgress);
+  }
+  // Fallback
+  const blobUrl = URL.createObjectURL(file);
+  if (onProgress) onProgress(100);
+  return { downloadUrl: blobUrl, storagePath: '' };
 }
 
 async function deleteFileFromStorage(storagePath) {
   if (!storagePath) return;
+  if (storagePath.startsWith('idb:')) {
+    const key = storagePath.replace('idb:', '');
+    if (typeof deleteIndexedDBFile === 'function') {
+      await deleteIndexedDBFile(key);
+    }
+    return;
+  }
   try {
-    await storage.ref(storagePath).delete();
+    if (typeof storage !== 'undefined' && storage.ref) {
+      await storage.ref(storagePath).delete();
+    }
   } catch (e) {
     console.warn('Storage delete failed:', e.message);
   }
