@@ -69,27 +69,28 @@
 }
 
 /* ── Light Mode Theme Overrides ── */
-html.light-mode,
+html.light-mode {
+  --bg-deep:    #f8fafc;
+  --bg-dark:    #f1f5f9;
+  --bg-card:    #ffffff;
+  --bg-card2:   #f8fafc;
+  --bg-border:  rgba(0, 200, 83, 0.25);
+
+  --glass-bg:       rgba(0, 200, 83, 0.05);
+  --glass-bg-hover: rgba(0, 200, 83, 0.1);
+  --glass-border:   rgba(0, 200, 83, 0.25);
+
+  --text-primary:   #0f172a;
+  --text-secondary: #334155;
+  --text-muted:     #64748b;
+  --text-dim:       #94a3b8;
+
+  --grad-dark:     linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  --grad-card:     linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(240,244,248,1) 100%);
+  --shadow-card:    0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
 html.light-mode body {
-  --bg-deep:    #f8fafc !important;
-  --bg-dark:    #f1f5f9 !important;
-  --bg-card:    #ffffff !important;
-  --bg-card2:   #ffffff !important;
-  --bg-border:  rgba(0, 200, 83, 0.2) !important;
-
-  --glass-bg:       rgba(0, 200, 83, 0.05) !important;
-  --glass-bg-hover: rgba(0, 200, 83, 0.1) !important;
-  --glass-border:   rgba(0, 200, 83, 0.25) !important;
-
-  --text-primary:   #0f172a !important;
-  --text-secondary: #334155 !important;
-  --text-muted:     #64748b !important;
-  --text-dim:       #94a3b8 !important;
-
-  --grad-dark:     linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
-  --grad-card:     linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(240,244,248,1) 100%) !important;
-  --shadow-card:    0 8px 32px rgba(0, 0, 0, 0.08) !important;
-
   background-color: #f1f5f9 !important;
   background: #f1f5f9 !important;
   color: #0f172a !important;
