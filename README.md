@@ -1,5 +1,9 @@
 # 💎 GOshare – Fast, Secure & Premium Cloud File Sharing Platform
 
+<p align="center">
+  <img src="assets/images/logo-horizontal.jpeg" alt="GOshare Logo" width="600" />
+</p>
+
 ![GOshare Banner](https://img.shields.io/badge/GOshare-v2.0.0-00C853?style=for-the-badge&logo=firebase&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-Auth%20%7C%20Firestore%20%7C%20Storage-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
 ![Security](https://img.shields.io/badge/Security-XSS%20Protected%20%7C%20Crypto%20ShortLinks-00E676?style=for-the-badge)
