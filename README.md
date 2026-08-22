@@ -13,25 +13,13 @@
 - 🔒 **Firebase Authentication**: Full user signup, signin, session persistence, and secure profile management.
 - 📁 **Cloud Storage & Database**: Multi-user real-time file upload, storage calculation, and metadata management powered by Firestore.
 - 🔗 **Short Link Generation**: Unique 6-character random alphanumeric links (`file.html?s=Ab3xZ9`) for instant file sharing.
-- 💸 **InstaPay Premium Subscriptions**: Integrated InstaPay instant transfer flow (`adhamhan0@instapay`) with instant WhatsApp screenshot verification (`@AdhamHany1`).
-- 🔑 **Admin Control Panel**: Dedicated Admin dashboard (`admin.html`) with hardcoded admin credentials (`adham.cs.guides@gmail.com`) to approve/reject pending subscriptions in real-time.
-- 🎨 **Modern Glassmorphism UI**: High-end emerald green & diamond styling, responsive layout, particle background, dark mode, and smooth animations.
-
 ---
 
 ## 🛠️ Tech Stack
 
 - **Frontend**: HTML5, CSS3 (Vanilla Glassmorphism & Custom Properties), JavaScript (ES6+)
 - **Backend Services**: Google Firebase (Authentication, Cloud Firestore, Cloud Storage)
-- **Deployment**: GitHub Pages / Firebase Hosting / Netlify
-
----
-
-## 🔑 Admin Access
-
-Access the control panel at [`admin.html`](admin.html):
-- **Admin Email**: `adham.cs.guides@gmail.com`
-- *(Admin credentials are fully protected and accessible via admin panel)*
+- **Deployment**: GitHub Pages / Firebase Hosting 
 
 ---
 
