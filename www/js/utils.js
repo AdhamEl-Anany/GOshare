@@ -269,6 +269,9 @@ function initGlobalNavAuth() {
   const navActions = document.querySelector('.nav-actions');
   if (!navActions) return;
 
+  // Ensure Download App button always injects into static HTML navbars (file.html, index.html, pricing.html)
+  injectDownloadAppBtn(navActions);
+
   const cachedUser = JSON.parse(localStorage.getItem('goshare_user') || 'null');
 
   // Instant render from local cache if user is logged in
@@ -296,6 +299,19 @@ function initGlobalNavAuth() {
       }
     });
   }
+}
+
+// ── Inject Download App Button (always visible, idempotent) ──
+function injectDownloadAppBtn(container) {
+  if (container.querySelector('.download-app-btn')) return; // already injected
+  const btn = document.createElement('a');
+  btn.href = 'https://github.com/AdhamEl-Anany/GOshare/releases/download/v1.0.0/GOshare-Android-App.apk';
+  btn.className = 'btn btn-outline btn-sm download-app-btn';
+  btn.target = '_blank';
+  btn.title = 'Download GOshare Android App';
+  btn.style.cssText = 'border-color:var(--green-400);color:var(--green-400);display:inline-flex;align-items:center;gap:6px';
+  btn.innerHTML = '📲 Download App';
+  container.prepend(btn);
 }
 
 // ── Light/Dark Theme Manager ──
@@ -379,6 +395,7 @@ function renderNavLoggedIn(container, name) {
     <div class="nav-hamburger" id="nav-hamburger"><span></span><span></span><span></span></div>
   `;
   initMobileMenu();
+  injectDownloadAppBtn(container);
 }
 
 function renderNavLoggedOut(container) {
@@ -396,6 +413,7 @@ function renderNavLoggedOut(container) {
     <div class="nav-hamburger" id="nav-hamburger"><span></span><span></span><span></span></div>
   `;
   initMobileMenu();
+  injectDownloadAppBtn(container);
 }
 
 // Global click listener to hide user dropdown when clicking outside
