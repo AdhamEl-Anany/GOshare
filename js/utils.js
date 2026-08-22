@@ -298,6 +298,34 @@ function initGlobalNavAuth() {
   }
 }
 
+// ── Light/Dark Theme Manager ──
+function initThemeToggle() {
+  const savedTheme = localStorage.getItem('goshare_theme') || 'dark';
+  if (savedTheme === 'light') {
+    document.body.classList.add('light-mode');
+  } else {
+    document.body.classList.remove('light-mode');
+  }
+  updateThemeToggleIcon();
+}
+
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('goshare_theme', isLight ? 'light' : 'dark');
+  updateThemeToggleIcon();
+  if (typeof showToast === 'function') {
+    showToast(isLight ? 'Switched to Light Mode ☀️' : 'Switched to Dark Mode 🌙', 'info');
+  }
+}
+
+function updateThemeToggleIcon() {
+  const isLight = document.body.classList.contains('light-mode');
+  document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
+    btn.innerHTML = isLight ? '☀️' : '🌙';
+    btn.title = isLight ? 'Switch to Dark Mode' : 'Switch to Light Mode';
+  });
+}
+
 // ── Real-Time Currency Exchange Rate (USD to EGP) ──
 let cachedEgpRate = 50.0;
 async function getLiveUsdToEgpRate() {
@@ -325,10 +353,13 @@ function toggleNavUserDropdown(e) {
 
 function renderNavLoggedIn(container, name) {
   if (container.dataset.authState === 'logged-in' && container.querySelector('.nav-username')?.textContent.includes(name)) {
+    updateThemeToggleIcon();
     return;
   }
+  const isLight = document.body.classList.contains('light-mode');
   container.dataset.authState = 'logged-in';
   container.innerHTML = `
+    <button type="button" class="btn btn-glass btn-sm theme-toggle-btn" onclick="toggleTheme()" style="padding:6px 10px;font-size:1.1rem" title="Toggle Theme">${isLight ? '☀️' : '🌙'}</button>
     <a href="dashboard.html" class="btn btn-glass btn-sm">📁 My Dashboard</a>
     <div style="position:relative;display:inline-block">
       <button type="button" class="btn btn-glass btn-sm nav-username" onclick="toggleNavUserDropdown(event)" style="font-weight:600;color:var(--green-400);display:flex;align-items:center;gap:6px">
@@ -347,9 +378,14 @@ function renderNavLoggedIn(container, name) {
 }
 
 function renderNavLoggedOut(container) {
-  if (container.dataset.authState === 'logged-out') return;
+  if (container.dataset.authState === 'logged-out') {
+    updateThemeToggleIcon();
+    return;
+  }
+  const isLight = document.body.classList.contains('light-mode');
   container.dataset.authState = 'logged-out';
   container.innerHTML = `
+    <button type="button" class="btn btn-glass btn-sm theme-toggle-btn" onclick="toggleTheme()" style="padding:6px 10px;font-size:1.1rem" title="Toggle Theme">${isLight ? '☀️' : '🌙'}</button>
     <a href="auth.html" class="btn btn-outline btn-sm">Log In</a>
     <a href="auth.html" class="btn btn-primary btn-sm">Get Started</a>
     <div class="nav-hamburger" id="nav-hamburger"><span></span><span></span><span></span></div>
@@ -365,8 +401,12 @@ document.addEventListener('click', (e) => {
   }
 });
 
+// Init theme immediately before render to avoid flicker
+initThemeToggle();
+
 // Init on load
 document.addEventListener('DOMContentLoaded', () => {
+  initThemeToggle();
   initNavbar();
   initScrollReveal();
   initCounters();

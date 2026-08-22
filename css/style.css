@@ -58,6 +58,49 @@
 
   /* Spacing */
   --radius-sm:  8px;
+
+/* ── Light Mode Theme Overrides ── */
+body.light-mode {
+  --bg-deep:    #f8fafc;
+  --bg-dark:    #f1f5f9;
+  --bg-card:    #ffffff;
+  --bg-card2:   #f8fafc;
+  --bg-border:  rgba(0, 200, 83, 0.2);
+
+  --glass-bg:       rgba(0, 200, 83, 0.05);
+  --glass-bg-hover: rgba(0, 200, 83, 0.1);
+  --glass-border:   rgba(0, 200, 83, 0.25);
+
+  --text-primary:   #0f172a;
+  --text-secondary: #334155;
+  --text-muted:     #64748b;
+  --text-dim:       #94a3b8;
+
+  --grad-dark:     linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  --shadow-card:    0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode .navbar {
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode .footer {
+  background: #f1f5f9;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode .card,
+body.light-mode .file-hero-card,
+body.light-mode .share-card,
+body.light-mode .info-card,
+body.light-mode .plan-card,
+body.light-mode .auth-card,
+body.light-mode .request-card {
+  background: #ffffff;
+  border-color: rgba(0, 200, 83, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
   --radius-md:  12px;
   --radius-lg:  20px;
   --radius-xl:  28px;
