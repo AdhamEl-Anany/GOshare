@@ -180,14 +180,14 @@ function renderFileDetail(file) {
   renderMediaPreview(file);
 }
 
-function startDownload(file) {
+async function startDownload(file) {
   const btn = document.getElementById('download-btn');
   const progressSection = document.getElementById('download-progress');
   const progressFill    = document.getElementById('download-progress-fill');
   const progressText    = document.getElementById('download-progress-text');
   const statusText      = document.getElementById('download-status');
 
-  if (!file.downloadUrl) {
+  if (!file || (!file.downloadUrl && !file.storagePath)) {
     showToast('Download URL not available', 'error');
     return;
   }
@@ -199,9 +199,25 @@ function startDownload(file) {
   // Increment download count in Firestore
   incrementDownloads(file.id).catch(() => {});
 
+  // Determine target download URL upfront
+  let targetUrl = file.downloadUrl;
+  if (file.storagePath && file.storagePath.startsWith('idb:')) {
+    const key = file.storagePath.replace('idb:', '');
+    if (typeof getIndexedDBFile === 'function') {
+      try {
+        const blob = await getIndexedDBFile(key);
+        if (blob) {
+          targetUrl = URL.createObjectURL(blob);
+        }
+      } catch (e) {
+        console.warn('IndexedDB retrieval error:', e);
+      }
+    }
+  }
+
   let pct = 0;
-  const interval = setInterval(async () => {
-    pct += Math.random() * 20 + 10;
+  const interval = setInterval(() => {
+    pct += 25;
     if (pct >= 100) {
       pct = 100;
       clearInterval(interval);
@@ -210,28 +226,24 @@ function startDownload(file) {
       if (progressText) progressText.textContent = '100%';
       if (statusText)   statusText.textContent = 'Download ready!';
 
-      let targetUrl = file.downloadUrl;
-      if (file.storagePath && file.storagePath.startsWith('idb:')) {
-        const key = file.storagePath.replace('idb:', '');
-        if (typeof getIndexedDBFile === 'function') {
-          const blob = await getIndexedDBFile(key);
-          if (blob) {
-            targetUrl = URL.createObjectURL(blob);
-          }
-        }
+      // Trigger direct save
+      if (targetUrl && targetUrl !== '#') {
+        const a = document.createElement('a');
+        a.href = targetUrl;
+        a.download = file.name || 'download';
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => a.remove(), 1000);
+      } else {
+        showToast('File binary is unavailable.', 'error');
       }
-
-      // Open download URL or trigger direct save
-      const a = document.createElement('a');
-      a.href = targetUrl;
-      a.download = file.name;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
 
       btn.innerHTML = '✅ Downloaded!';
       btn.style.background = 'var(--grad-green)';
-      showToast(`"${escapeHTML(file.name)}" download started!`, 'success');
+      if (typeof showToast === 'function') {
+        showToast(`"${escapeHTML(file.name)}" download started!`, 'success');
+      }
 
       setTimeout(() => {
         btn.disabled = false;
@@ -240,11 +252,11 @@ function startDownload(file) {
         if (progressSection) progressSection.style.display = 'none';
       }, 3000);
     } else {
-      if (progressFill) progressFill.style.width = pct.toFixed(0) + '%';
-      if (progressText) progressText.textContent = pct.toFixed(0) + '%';
+      if (progressFill) progressFill.style.width = pct + '%';
+      if (progressText) progressText.textContent = pct + '%';
       if (statusText)   statusText.textContent = `Preparing… ${formatSize(file.size * pct / 100)} / ${formatSize(file.size)}`;
     }
-  }, 150);
+  }, 100);
 }
 
 function showFileNotFound() {
