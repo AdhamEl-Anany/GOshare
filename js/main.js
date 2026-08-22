@@ -20,7 +20,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Drag preview on hero
   initHeroDragPreview();
+
+  // Load Live Dynamic Stats from Firestore
+  loadPublicStats();
 });
+
+// ── Live Stats Loader (Firestore) ──
+async function loadPublicStats() {
+  const elFiles   = document.getElementById('live-stat-files');
+  const elUsers   = document.getElementById('live-stat-users');
+  const elStorage = document.getElementById('live-stat-storage');
+
+  if (!elFiles || !elUsers || !elStorage) return;
+
+  try {
+    const stats = await getPublicPlatformStats();
+
+    if (typeof animateCounter === 'function') {
+      animateCounter(elFiles, stats.totalFiles, 1200);
+      animateCounter(elUsers, stats.totalUsers, 1200);
+    } else {
+      elFiles.textContent = stats.totalFiles;
+      elUsers.textContent = stats.totalUsers;
+    }
+
+    if (stats.totalStorage > 0) {
+      elStorage.textContent = formatSize(stats.totalStorage);
+    } else {
+      elStorage.textContent = '0 MB';
+    }
+  } catch (e) {
+    console.warn('Load public stats notice:', e);
+  }
+}
 
 // ── Typing effect ──
 function initTypingEffect() {

@@ -319,3 +319,28 @@ async function getAdminStats() {
     pendingRequests: pendingSnap.size
   };
 }
+
+// ── Public Platform Live Stats (Homepage) ──
+async function getPublicPlatformStats() {
+  try {
+    const usersSnap = await db.collection('users').get();
+    const filesSnap = await db.collection('files').get();
+
+    const totalUsers = usersSnap.size || 0;
+    const totalFiles = filesSnap.size || 0;
+
+    let totalStorage = 0;
+    filesSnap.forEach(doc => {
+      totalStorage += (doc.data().size || 0);
+    });
+
+    return {
+      totalUsers,
+      totalFiles,
+      totalStorage
+    };
+  } catch (e) {
+    console.warn('Public stats query notice:', e);
+    return { totalUsers: 0, totalFiles: 0, totalStorage: 0 };
+  }
+}
