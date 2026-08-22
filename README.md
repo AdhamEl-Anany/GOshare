@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/GOshare-v2.0.0-00C853?style=for-the-badge&logo=firebase&logoColor=white" />
+  <img src="https://img.shields.io/badge/GOshare-v1.0.0-00C853?style=for-the-badge&logo=firebase&logoColor=white" />
   <img src="https://img.shields.io/badge/Android%20App-v1.0.0%20APK-3DDC84?style=for-the-badge&logo=android&logoColor=white" />
   <img src="https://img.shields.io/badge/Firebase-Auth%20%7C%20Firestore%20%7C%20Storage-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" />
   <img src="https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" />
