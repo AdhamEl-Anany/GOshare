@@ -126,7 +126,7 @@ async function checkAndApplyNoAds(file) {
   } catch (err) {
     console.warn('Ad preference check notice:', err);
   }
-}"
+}
 
 function renderFileDetail(file) {
   document.title = `${file.name} – GOshare`;
