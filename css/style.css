@@ -58,6 +58,15 @@
 
   /* Spacing */
   --radius-sm:  8px;
+  --radius-md:  12px;
+  --radius-lg:  20px;
+  --radius-xl:  28px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
 /* ── Light Mode Theme Overrides ── */
 body.light-mode {
@@ -78,15 +87,17 @@ body.light-mode {
 
   --grad-dark:     linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
   --shadow-card:    0 8px 32px rgba(0, 0, 0, 0.08);
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
 }
 
 body.light-mode .navbar {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.9) !important;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 body.light-mode .footer {
-  background: #f1f5f9;
+  background: #f1f5f9 !important;
   border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 
@@ -96,19 +107,20 @@ body.light-mode .share-card,
 body.light-mode .info-card,
 body.light-mode .plan-card,
 body.light-mode .auth-card,
-body.light-mode .request-card {
-  background: #ffffff;
+body.light-mode .request-card,
+body.light-mode .modal-card,
+body.light-mode .sidebar {
+  background: #ffffff !important;
   border-color: rgba(0, 200, 83, 0.2);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
-  --radius-md:  12px;
-  --radius-lg:  20px;
-  --radius-xl:  28px;
-  --radius-full: 9999px;
 
-  /* Transitions */
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+body.light-mode h1,
+body.light-mode h2,
+body.light-mode h3,
+body.light-mode h4,
+body.light-mode .nav-logo span {
+  color: #0f172a !important;
 }
 
 /* ── Reset ── */
