@@ -1,0 +1,7 @@
+# Ignore temporary media and uploaded screenshots
+chatgpt_screenshots/
+*.zip
+*.log
+.DS_Store
+Thumbs.db
+node_modules/
