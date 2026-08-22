@@ -269,9 +269,6 @@ function initGlobalNavAuth() {
   const navActions = document.querySelector('.nav-actions');
   if (!navActions) return;
 
-  // Ensure Download App button always injects into static HTML navbars (file.html, index.html, pricing.html)
-  injectDownloadAppBtn(navActions);
-
   const cachedUser = JSON.parse(localStorage.getItem('goshare_user') || 'null');
 
   // Instant render from local cache if user is logged in
@@ -299,19 +296,6 @@ function initGlobalNavAuth() {
       }
     });
   }
-}
-
-// ── Inject Download App Button (always visible, idempotent) ──
-function injectDownloadAppBtn(container) {
-  if (container.querySelector('.download-app-btn')) return; // already injected
-  const btn = document.createElement('a');
-  btn.href = 'https://github.com/AdhamEl-Anany/GOshare/releases/download/v1.0.0/GOshare-Android-App.apk';
-  btn.className = 'btn btn-outline btn-sm download-app-btn';
-  btn.target = '_blank';
-  btn.title = 'Download GOshare Android App';
-  btn.style.cssText = 'border-color:var(--green-400);color:var(--green-400);display:inline-flex;align-items:center;gap:6px';
-  btn.innerHTML = '📲 Download App';
-  container.prepend(btn);
 }
 
 // ── Light/Dark Theme Manager ──
@@ -379,7 +363,6 @@ function renderNavLoggedIn(container, name) {
   container.dataset.authState = 'logged-in';
   container.innerHTML = `
     <button type="button" class="btn btn-glass btn-sm theme-toggle-btn" onclick="toggleTheme()" style="padding:6px 10px;font-size:1.1rem" title="Toggle Theme">${isLight ? '☀️' : '🌙'}</button>
-    <a href="https://github.com/AdhamEl-Anany/GOshare/releases/download/v1.0.0/GOshare-Android-App.apk" class="btn btn-outline btn-sm" style="border-color:var(--green-400);color:var(--green-400);display:inline-flex;align-items:center;gap:6px" target="_blank" title="Download GOshare Android App">📲 Download App</a>
     <a href="dashboard.html" class="btn btn-glass btn-sm">📁 My Dashboard</a>
     <div style="position:relative;display:inline-block">
       <button type="button" class="btn btn-glass btn-sm nav-username" onclick="toggleNavUserDropdown(event)" style="font-weight:600;color:var(--green-400);display:flex;align-items:center;gap:6px">
@@ -395,7 +378,6 @@ function renderNavLoggedIn(container, name) {
     <div class="nav-hamburger" id="nav-hamburger"><span></span><span></span><span></span></div>
   `;
   initMobileMenu();
-  injectDownloadAppBtn(container);
 }
 
 function renderNavLoggedOut(container) {
@@ -407,13 +389,11 @@ function renderNavLoggedOut(container) {
   container.dataset.authState = 'logged-out';
   container.innerHTML = `
     <button type="button" class="btn btn-glass btn-sm theme-toggle-btn" onclick="toggleTheme()" style="padding:6px 10px;font-size:1.1rem" title="Toggle Theme">${isLight ? '☀️' : '🌙'}</button>
-    <a href="https://github.com/AdhamEl-Anany/GOshare/releases/download/v1.0.0/GOshare-Android-App.apk" class="btn btn-outline btn-sm" style="border-color:var(--green-400);color:var(--green-400);display:inline-flex;align-items:center;gap:6px" target="_blank" title="Download GOshare Android App">📲 Download App</a>
     <a href="auth.html" class="btn btn-outline btn-sm">Log In</a>
     <a href="auth.html" class="btn btn-primary btn-sm">Get Started</a>
     <div class="nav-hamburger" id="nav-hamburger"><span></span><span></span><span></span></div>
   `;
   initMobileMenu();
-  injectDownloadAppBtn(container);
 }
 
 // Global click listener to hide user dropdown when clicking outside
