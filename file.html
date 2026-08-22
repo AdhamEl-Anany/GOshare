@@ -363,14 +363,14 @@
     <div class="share-card">
       <h3>🔗 Share this file</h3>
       <div class="share-url-wrap">
-        <input type="text" id="share-url" readonly />
+        <input type="text" id="share-url" readonly placeholder="Loading share link…" />
         <button class="btn btn-primary btn-sm" id="copy-link-btn">📋 Copy</button>
       </div>
       <div class="share-social-btns">
-        <button class="share-social" onclick="showToast('Share to WhatsApp!','info')">📱 WhatsApp</button>
-        <button class="share-social" onclick="showToast('Share to Telegram!','info')">✈️ Telegram</button>
-        <button class="share-social" onclick="showToast('Share to Twitter!','info')">🐦 Twitter</button>
-        <button class="share-social" onclick="showToast('Share by Email!','info')">📧 Email</button>
+        <button type="button" class="share-social" onclick="shareToSocial('whatsapp')">📱 WhatsApp</button>
+        <button type="button" class="share-social" onclick="shareToSocial('telegram')">✈️ Telegram</button>
+        <button type="button" class="share-social" onclick="shareToSocial('twitter')">🐦 Twitter</button>
+        <button type="button" class="share-social" onclick="shareToSocial('email')">📧 Email</button>
       </div>
     </div>
 

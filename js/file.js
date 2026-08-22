@@ -3,6 +3,9 @@
    =========================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+  const shareInput = document.getElementById('share-url');
+  if (shareInput) shareInput.value = window.location.href;
+
   const params = new URLSearchParams(window.location.search);
   const shortId = params.get('s');
 
@@ -16,8 +19,34 @@ document.addEventListener('DOMContentLoaded', () => {
   // Copy link
   document.getElementById('copy-link-btn')?.addEventListener('click', () => {
     copyToClipboard(window.location.href);
+    if (typeof showToast === 'function') showToast('Share link copied to clipboard! 📋', 'success');
   });
 });
+
+function shareToSocial(platform) {
+  const url = encodeURIComponent(window.location.href);
+  const text = encodeURIComponent('Check out this shared file on GOshare:');
+  let shareLink = '';
+
+  switch (platform) {
+    case 'whatsapp':
+      shareLink = `https://api.whatsapp.com/send?text=${text}%20${url}`;
+      break;
+    case 'telegram':
+      shareLink = `https://t.me/share/url?url=${url}&text=${text}`;
+      break;
+    case 'twitter':
+      shareLink = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+      break;
+    case 'email':
+      shareLink = `mailto:?subject=${encodeURIComponent('Shared File on GOshare')}&body=${text}%20${url}`;
+      break;
+  }
+
+  if (shareLink) {
+    window.open(shareLink, '_blank');
+  }
+}
 
 "window.unlockedFiles = window.unlockedFiles || {};
 
