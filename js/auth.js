@@ -68,6 +68,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const loggedUser = cred.user;
         const isAdmin = loggedUser.email && loggedUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
 
+        // Ensure user document exists in Firestore for stats counting
+        let userDoc = await getUserDoc(loggedUser.uid);
+        if (!userDoc) {
+          await createUserDoc(loggedUser.uid, {
+            name: loggedUser.displayName || loggedUser.email.split('@')[0],
+            email: loggedUser.email,
+            plan: 'free',
+            role: isAdmin ? 'admin' : 'user'
+          });
+        }
+
         localStorage.setItem('goshare_user', JSON.stringify({
           uid: loggedUser.uid,
           email: loggedUser.email,
