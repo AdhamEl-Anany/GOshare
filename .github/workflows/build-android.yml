@@ -31,22 +31,29 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Build Web Assets & Capacitor Sync
+      - name: Build Web Assets & Add/Sync Capacitor Android
         run: |
           mkdir -p www
-          cp -r index.html auth.html dashboard.html file.html pricing.html admin.html css js assets www/
-          npx cap sync android
+          cp index.html auth.html dashboard.html file.html pricing.html admin.html www/
+          cp -r css js assets www/
+          if [ ! -d "android" ]; then
+            npx cap add android
+          else
+            npx cap sync android
+          fi
 
       - name: Make Gradle Executable
         run: chmod +x android/gradlew
 
-      - name: Build Android Debug APK & Release Bundle
+      - name: Build Android Debug APK
         run: |
           cd android
-          ./gradlew assembleDebug assembleRelease bundleRelease
+          ./gradlew assembleDebug
+
+      - name: Build Android Release AAB & APK
+        run: |
+          cd android
+          ./gradlew assembleRelease bundleRelease
 
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
