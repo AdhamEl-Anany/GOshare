@@ -176,24 +176,37 @@ async function createShortLink(shortId, fileId, ownerId) {
 }
 
 async function getFileByShortId(shortId) {
-  try {
-    const linkDoc = await db.collection('links').doc(shortId).get();
-    if (linkDoc.exists) {
-      const linkData = linkDoc.data();
-      const fileDoc = await db.collection('files').doc(linkData.fileId).get();
-      if (fileDoc.exists) return { id: fileDoc.id, ...fileDoc.data() };
-    }
-  } catch (e) {}
+  const fetchWithTimeout = (promise, ms = 4000) => {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore query timeout')), ms))
+    ]);
+  };
 
-  const fallbackFiles = JSON.parse(localStorage.getItem('goshare_files_fallback') || '[]');
-  const file = fallbackFiles.find(f => f.shortId === shortId);
-  if (file) return file;
+  try {
+    const linkDoc = await fetchWithTimeout(db.collection('links').doc(shortId).get());
+    if (linkDoc && linkDoc.exists) {
+      const linkData = linkDoc.data();
+      const fileDoc = await fetchWithTimeout(db.collection('files').doc(linkData.fileId).get());
+      if (fileDoc && fileDoc.exists) return { id: fileDoc.id, ...fileDoc.data() };
+    }
+  } catch (e) {
+    console.warn('Firestore link query notice:', e.message);
+  }
+
+  try {
+    const fallbackFiles = JSON.parse(localStorage.getItem('goshare_files_fallback') || '[]');
+    const file = fallbackFiles.find(f => f.shortId === shortId);
+    if (file) return file;
+  } catch (e) {}
 
   // Search by shortId in files collection
   try {
-    const snap = await db.collection('files').where('shortId', '==', shortId).limit(1).get();
-    if (!snap.empty) return { id: snap.docs[0].id, ...snap.docs[0].data() };
-  } catch (e) {}
+    const snap = await fetchWithTimeout(db.collection('files').where('shortId', '==', shortId).limit(1).get());
+    if (snap && !snap.empty) return { id: snap.docs[0].id, ...snap.docs[0].data() };
+  } catch (e) {
+    console.warn('Firestore files search notice:', e.message);
+  }
 
   return null;
 }
