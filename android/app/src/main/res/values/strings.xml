@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">GOshare</string>
+    <string name="title_activity_main">GOshare</string>
+    <string name="package_name">com.goshare.app</string>
+    <string name="custom_url_scheme">com.goshare.app</string>
+</resources>

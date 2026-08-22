@@ -1,0 +1,32 @@
+{
+  "name": "goshare",
+  "version": "1.0.0",
+  "description": "GOshare Cloud Sharing Android & Web Platform",
+  "main": "index.js",
+  "scripts": {
+    "build": "powershell -Command \"mkdir -Force www; Copy-Item index.html, auth.html, dashboard.html, file.html, pricing.html, admin.html www/; Copy-Item css, js, assets www/ -Recurse -Force\"",
+    "cap:sync": "npm run build && npx cap sync android",
+    "cap:open": "npx cap open android"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdhamEl-Anany/GOshare.git"
+  },
+  "keywords": [],
+  "author": "ENG.Adham Hany",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/browser": "^8.0.4",
+    "@capacitor/core": "^8.5.0",
+    "@capacitor/filesystem": "^8.1.3",
+    "@capacitor/keyboard": "^8.0.5",
+    "@capacitor/share": "^8.0.1",
+    "@capacitor/status-bar": "^8.0.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.0"
+  }
+}
