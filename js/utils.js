@@ -240,10 +240,69 @@ async function copyToClipboard(text) {
   }
 }
 
+// ── Global Navbar Auth Manager ──
+function initGlobalNavAuth() {
+  const navActions = document.querySelector('.nav-actions');
+  if (!navActions) return;
+
+  const cachedUser = JSON.parse(localStorage.getItem('goshare_user') || 'null');
+
+  // Instant render from local cache if user is logged in
+  if (cachedUser) {
+    renderNavLoggedIn(navActions, cachedUser.name || cachedUser.displayName || (cachedUser.email ? cachedUser.email.split('@')[0] : 'User'));
+  }
+
+  // Firebase listener confirmation
+  if (typeof auth !== 'undefined') {
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        const name = user.displayName || (user.email ? user.email.split('@')[0] : 'User');
+        const currentCache = JSON.parse(localStorage.getItem('goshare_user') || '{}');
+        const updated = {
+          ...currentCache,
+          uid: user.uid,
+          email: user.email,
+          name: name
+        };
+        localStorage.setItem('goshare_user', JSON.stringify(updated));
+        renderNavLoggedIn(navActions, name);
+      } else {
+        localStorage.removeItem('goshare_user');
+        renderNavLoggedOut(navActions);
+      }
+    });
+  }
+}
+
+function renderNavLoggedIn(container, name) {
+  if (container.dataset.authState === 'logged-in' && container.querySelector('.nav-username')?.textContent.includes(name)) {
+    return;
+  }
+  container.dataset.authState = 'logged-in';
+  container.innerHTML = `
+    <a href="dashboard.html" class="btn btn-glass btn-sm">📁 My Dashboard</a>
+    <span class="nav-username" style="font-size:0.85rem;color:var(--green-400);font-weight:600;display:flex;align-items:center;gap:4px">👤 ${name}</span>
+    <div class="nav-hamburger" id="nav-hamburger"><span></span><span></span><span></span></div>
+  `;
+  initMobileMenu();
+}
+
+function renderNavLoggedOut(container) {
+  if (container.dataset.authState === 'logged-out') return;
+  container.dataset.authState = 'logged-out';
+  container.innerHTML = `
+    <a href="auth.html" class="btn btn-outline btn-sm">Log In</a>
+    <a href="auth.html" class="btn btn-primary btn-sm">Get Started</a>
+    <div class="nav-hamburger" id="nav-hamburger"><span></span><span></span><span></span></div>
+  `;
+  initMobileMenu();
+}
+
 // Init on load
 document.addEventListener('DOMContentLoaded', () => {
   initNavbar();
   initScrollReveal();
   initCounters();
   initMobileMenu();
+  initGlobalNavAuth();
 });
