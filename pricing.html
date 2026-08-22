@@ -492,6 +492,10 @@
       <div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--bg-border);font-size:0.82rem;color:var(--text-muted);text-align:left">
         <p style="font-weight:700;color:var(--green-400);margin-bottom:4px">⚡ Pay via InstaPay (Egypt):</p>
         <p>Transfer to InstaPay: <strong style="color:#fff">adhamhan0@instapay</strong></p>
+        
+        <!-- Dynamic EGP Exchange Amount -->
+        <div id="instapay-dynamic-amount"></div>
+
         <p>Send screenshot & email to WhatsApp: <a href="https://wa.me/20113000000?text=I%20want%20to%20upgrade%20my%20GOshare%20account" target="_blank" style="color:var(--green-400);text-decoration:underline">@AdhamHany1</a></p>
         
         <button type="button" class="btn btn-primary btn-sm" id="btn-instapay-submit" style="margin-top:12px;width:100%">
@@ -599,6 +603,27 @@ function closePayModal() {
   }, 300);
 }
 
+async function updateInstaPayDynamicAmount() {
+  const container = document.getElementById('instapay-dynamic-amount');
+  if (!container) return;
+  
+  container.innerHTML = `<div style="font-size:0.8rem;color:var(--text-muted);padding:6px 0">⟳ Fetching live EGP exchange rate…</div>`;
+  
+  const egpRate = typeof getLiveUsdToEgpRate === 'function' ? await getLiveUsdToEgpRate() : 50.0;
+  const priceUsd = parseFloat(selectedPrice) || 9;
+  const totalEgp = (priceUsd * egpRate).toFixed(2);
+
+  container.innerHTML = `
+    <div style="background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.3);border-radius:var(--radius-lg);padding:12px;margin:12px 0;text-align:center">
+      <div style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:4px">💰 Total to Transfer via InstaPay in EGP:</div>
+      <div style="font-size:1.4rem;font-weight:900;color:var(--green-400);line-height:1.2">
+        ${totalEgp} EGP <span style="font-size:0.85rem;color:var(--text-primary);font-weight:600">($${priceUsd} USD)</span>
+      </div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px">⚡ Live Exchange Rate: $1 USD = ${egpRate.toFixed(2)} EGP</div>
+    </div>
+  `;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.plan-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -631,6 +656,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       openPayModal();
       renderPayPalButtons();
+      updateInstaPayDynamicAmount();
     });
   });
 

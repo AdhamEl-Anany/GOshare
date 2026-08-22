@@ -298,6 +298,31 @@ function initGlobalNavAuth() {
   }
 }
 
+// ── Real-Time Currency Exchange Rate (USD to EGP) ──
+let cachedEgpRate = 50.0;
+async function getLiveUsdToEgpRate() {
+  try {
+    const res = await fetch('https://open.er-api.com/v6/latest/USD');
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.rates && data.rates.EGP) {
+        cachedEgpRate = parseFloat(data.rates.EGP);
+        return cachedEgpRate;
+      }
+    }
+  } catch (e) {
+    console.warn('Currency exchange rate API notice:', e);
+  }
+  return cachedEgpRate;
+}
+
+function toggleNavUserDropdown(e) {
+  if (e) e.stopPropagation();
+  const menu = document.getElementById('nav-user-menu');
+  if (!menu) return;
+  menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}
+
 function renderNavLoggedIn(container, name) {
   if (container.dataset.authState === 'logged-in' && container.querySelector('.nav-username')?.textContent.includes(name)) {
     return;
@@ -305,7 +330,17 @@ function renderNavLoggedIn(container, name) {
   container.dataset.authState = 'logged-in';
   container.innerHTML = `
     <a href="dashboard.html" class="btn btn-glass btn-sm">📁 My Dashboard</a>
-    <span class="nav-username" style="font-size:0.85rem;color:var(--green-400);font-weight:600;display:flex;align-items:center;gap:4px">👤 ${name}</span>
+    <div style="position:relative;display:inline-block">
+      <button type="button" class="btn btn-glass btn-sm nav-username" onclick="toggleNavUserDropdown(event)" style="font-weight:600;color:var(--green-400);display:flex;align-items:center;gap:6px">
+        👤 ${escapeHTML(name)} ▾
+      </button>
+      <div id="nav-user-menu" style="display:none;position:absolute;right:0;top:calc(100% + 8px);background:var(--bg-card2);border:1px solid var(--glass-border);border-radius:var(--radius-md);padding:6px;min-width:170px;z-index:99999;box-shadow:var(--shadow-card)">
+        <a href="dashboard.html" style="display:flex;align-items:center;gap:8px;padding:8px 12px;color:var(--text-primary);text-decoration:none;font-size:0.85rem;border-radius:var(--radius-sm)">📁 My Dashboard</a>
+        <a href="pricing.html" style="display:flex;align-items:center;gap:8px;padding:8px 12px;color:var(--text-primary);text-decoration:none;font-size:0.85rem;border-radius:var(--radius-sm)">💎 Upgrade Plan</a>
+        <div style="height:1px;background:var(--bg-border);margin:4px 0"></div>
+        <button type="button" onclick="globalLogout('index.html')" style="width:100%;text-align:left;display:flex;align-items:center;gap:8px;padding:8px 12px;color:#ef5350;background:none;border:none;font-size:0.85rem;cursor:pointer;border-radius:var(--radius-sm)">🚪 Logout</button>
+      </div>
+    </div>
     <div class="nav-hamburger" id="nav-hamburger"><span></span><span></span><span></span></div>
   `;
   initMobileMenu();
@@ -321,6 +356,14 @@ function renderNavLoggedOut(container) {
   `;
   initMobileMenu();
 }
+
+// Global click listener to hide user dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('nav-user-menu');
+  if (menu && !menu.contains(e.target) && !e.target.closest('.nav-username')) {
+    menu.style.display = 'none';
+  }
+});
 
 // Init on load
 document.addEventListener('DOMContentLoaded', () => {
