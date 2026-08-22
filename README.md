@@ -52,21 +52,6 @@ GOshare is now available as a native **Android Application** (APK & AAB)!
 
 ---
 
-## 💻 Local Development & Build
-
-```bash
-# Clone the repository
-git clone https://github.com/AdhamEl-Anany/GOshare.git
-
-# Navigate to project folder
-cd GOshare
-
-# Sync web assets to Android Capacitor container
-npm run cap:sync
-```
-
----
-
 ## 👨‍💻 Developer & Credits
 
 Developed and Managed by **ENG.Adham Hany**
