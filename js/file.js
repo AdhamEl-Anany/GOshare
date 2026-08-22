@@ -60,6 +60,8 @@ function shareToSocial(platform) {
   if (shareLink) {
     window.open(shareLink, '_blank');
   }
+}
+
 window.unlockedFiles = window.unlockedFiles || {};
 
 async function loadFileByShortId(shortId) {
