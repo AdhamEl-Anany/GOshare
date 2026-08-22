@@ -302,15 +302,18 @@ function initGlobalNavAuth() {
 function initThemeToggle() {
   const savedTheme = localStorage.getItem('goshare_theme') || 'dark';
   if (savedTheme === 'light') {
-    document.body.classList.add('light-mode');
+    document.documentElement.classList.add('light-mode');
+    if (document.body) document.body.classList.add('light-mode');
   } else {
-    document.body.classList.remove('light-mode');
+    document.documentElement.classList.remove('light-mode');
+    if (document.body) document.body.classList.remove('light-mode');
   }
   updateThemeToggleIcon();
 }
 
 function toggleTheme() {
-  const isLight = document.body.classList.toggle('light-mode');
+  const isLight = document.documentElement.classList.toggle('light-mode');
+  if (document.body) document.body.classList.toggle('light-mode', isLight);
   localStorage.setItem('goshare_theme', isLight ? 'light' : 'dark');
   updateThemeToggleIcon();
   if (typeof showToast === 'function') {
@@ -319,7 +322,7 @@ function toggleTheme() {
 }
 
 function updateThemeToggleIcon() {
-  const isLight = document.body.classList.contains('light-mode');
+  const isLight = document.documentElement.classList.contains('light-mode');
   document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
     btn.innerHTML = isLight ? '☀️' : '🌙';
     btn.title = isLight ? 'Switch to Dark Mode' : 'Switch to Light Mode';

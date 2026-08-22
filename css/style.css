@@ -69,58 +69,86 @@
 }
 
 /* ── Light Mode Theme Overrides ── */
-body.light-mode {
-  --bg-deep:    #f8fafc;
-  --bg-dark:    #f1f5f9;
-  --bg-card:    #ffffff;
-  --bg-card2:   #f8fafc;
-  --bg-border:  rgba(0, 200, 83, 0.2);
+html.light-mode,
+html.light-mode body {
+  --bg-deep:    #f8fafc !important;
+  --bg-dark:    #f1f5f9 !important;
+  --bg-card:    #ffffff !important;
+  --bg-card2:   #ffffff !important;
+  --bg-border:  rgba(0, 200, 83, 0.2) !important;
 
-  --glass-bg:       rgba(0, 200, 83, 0.05);
-  --glass-bg-hover: rgba(0, 200, 83, 0.1);
-  --glass-border:   rgba(0, 200, 83, 0.25);
+  --glass-bg:       rgba(0, 200, 83, 0.05) !important;
+  --glass-bg-hover: rgba(0, 200, 83, 0.1) !important;
+  --glass-border:   rgba(0, 200, 83, 0.25) !important;
 
-  --text-primary:   #0f172a;
-  --text-secondary: #334155;
-  --text-muted:     #64748b;
-  --text-dim:       #94a3b8;
+  --text-primary:   #0f172a !important;
+  --text-secondary: #334155 !important;
+  --text-muted:     #64748b !important;
+  --text-dim:       #94a3b8 !important;
 
-  --grad-dark:     linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-  --shadow-card:    0 8px 32px rgba(0, 0, 0, 0.08);
+  --grad-dark:     linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
+  --grad-card:     linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(240,244,248,1) 100%) !important;
+  --shadow-card:    0 8px 32px rgba(0, 0, 0, 0.08) !important;
+
   background-color: #f1f5f9 !important;
-  color: #0f172a !important;
-}
-
-body.light-mode .navbar {
-  background: rgba(255, 255, 255, 0.9) !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-body.light-mode .footer {
   background: #f1f5f9 !important;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-body.light-mode .card,
-body.light-mode .file-hero-card,
-body.light-mode .share-card,
-body.light-mode .info-card,
-body.light-mode .plan-card,
-body.light-mode .auth-card,
-body.light-mode .request-card,
-body.light-mode .modal-card,
-body.light-mode .sidebar {
-  background: #ffffff !important;
-  border-color: rgba(0, 200, 83, 0.2);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-}
-
-body.light-mode h1,
-body.light-mode h2,
-body.light-mode h3,
-body.light-mode h4,
-body.light-mode .nav-logo span {
   color: #0f172a !important;
+}
+
+html.light-mode .navbar {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+html.light-mode .footer {
+  background: #e2e8f0 !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+html.light-mode .hero-section,
+html.light-mode .features-section,
+html.light-mode .stats-section,
+html.light-mode .pricing-section,
+html.light-mode .dashboard-layout,
+html.light-mode .admin-layout,
+html.light-mode .auth-section,
+html.light-mode .file-main {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+html.light-mode .card,
+html.light-mode .file-card,
+html.light-mode .file-list-item,
+html.light-mode .file-hero-card,
+html.light-mode .share-card,
+html.light-mode .info-card,
+html.light-mode .plan-card,
+html.light-mode .auth-card,
+html.light-mode .request-card,
+html.light-mode .modal-card,
+html.light-mode .sidebar {
+  background: #ffffff !important;
+  border-color: rgba(0, 200, 83, 0.25) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+  color: #0f172a !important;
+}
+
+html.light-mode h1,
+html.light-mode h2,
+html.light-mode h3,
+html.light-mode h4,
+html.light-mode p,
+html.light-mode span,
+html.light-mode div,
+html.light-mode label,
+html.light-mode .nav-logo span {
+  color: #0f172a;
+}
+
+html.light-mode .text-muted,
+html.light-mode p.subtitle {
+  color: #64748b !important;
 }
 
 /* ── Reset ── */
