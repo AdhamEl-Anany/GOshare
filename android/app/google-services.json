@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "962464942390",
+    "project_id": "goshare-cd92f",
+    "storage_bucket": "goshare-cd92f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:962464942390:android:1c440b6a81e174cad70b97",
+        "android_client_info": {
+          "package_name": "com.goshare.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "962464942390-j2oa4cho64iffvegfre7g3v9cujsmetr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoCMLA5UZoIepS3Yb-uYQ7avEUg4cIsIo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "962464942390-j2oa4cho64iffvegfre7g3v9cujsmetr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
