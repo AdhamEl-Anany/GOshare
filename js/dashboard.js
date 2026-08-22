@@ -332,6 +332,8 @@ function openContextMenu(x, y, id, e) {
     <div class="context-menu-item" onclick="shareFile('${safeId}')">🔗 &nbsp; Copy Share Link</div>
     <div class="context-menu-item" onclick="downloadFile('${safeId}')">⬇️ &nbsp; Download</div>
     <div class="context-menu-item" onclick="openRenameModal('${safeId}')">✏️ &nbsp; Rename</div>
+    <div class="context-menu-item" onclick="openProtectModal('${safeId}')">🔒 &nbsp; Protect Password</div>
+    <div class="context-menu-item" onclick="openExpireModal('${safeId}')">⏳ &nbsp; Expiration Link</div>
     <div class="context-menu-divider"></div>
     <div class="context-menu-item danger" onclick="deleteFile('${safeId}')">🗑️ &nbsp; Delete</div>
   `;
@@ -341,6 +343,56 @@ function openContextMenu(x, y, id, e) {
   const vw = window.innerWidth, vh = window.innerHeight;
   menu.style.left = (x + rect.width > vw ? x - rect.width : x) + 'px';
   menu.style.top  = (y + rect.height > vh ? y - rect.height : y) + 'px';
+}
+
+async function openProtectModal(id) {
+  closeContextMenu();
+  const file = allFiles.find(f => f.id === id);
+  if (!file) return;
+
+  const currentPass = file.accessPassword || '';
+  const newPass = prompt(`🔒 Set a Password for "${file.name}" (Leave empty to remove password):`, currentPass);
+  if (newPass === null) return;
+
+  try {
+    await db.collection('files').doc(file.id).update({
+      accessPassword: newPass.trim()
+    });
+    file.accessPassword = newPass.trim();
+    showToast(newPass.trim() ? 'Password protection enabled! 🔒' : 'Password protection removed! 🔓', 'success');
+  } catch (e) {
+    showToast('Failed to update password: ' + e.message, 'error');
+  }
+}
+
+async function openExpireModal(id) {
+  closeContextMenu();
+  const file = allFiles.find(f => f.id === id);
+  if (!file) return;
+
+  const daysStr = prompt(`⏳ Enter number of days until link expires for "${file.name}" (e.g., 7 for 7 days, 1 for 24h, 0 to disable):`, '7');
+  if (daysStr === null) return;
+
+  const days = parseInt(daysStr, 10);
+  if (isNaN(days) || days < 0) {
+    showToast('Invalid number of days', 'error');
+    return;
+  }
+
+  let expiresAt = null;
+  if (days > 0) {
+    expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+  }
+
+  try {
+    await db.collection('files').doc(file.id).update({
+      expiresAt: expiresAt ? firebase.firestore.Timestamp.fromDate(expiresAt) : null
+    });
+    file.expiresAt = expiresAt;
+    showToast(expiresAt ? `Link set to expire in ${days} days ⏳` : 'Link expiration removed ♾️', 'success');
+  } catch (e) {
+    showToast('Failed to set expiration: ' + e.message, 'error');
+  }
 }
 
 function closeContextMenu() {

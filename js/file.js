@@ -19,11 +19,31 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-"async function loadFileByShortId(shortId) {
+"window.unlockedFiles = window.unlockedFiles || {};
+
+async function loadFileByShortId(shortId) {
   try {
     const file = await getFileByShortId(shortId);
     if (!file) {
       showFileNotFound();
+      return;
+    }
+
+    // 1. Expiring link check
+    if (file.expiresAt) {
+      const expTime = file.expiresAt.toDate ? file.expiresAt.toDate() : new Date(file.expiresAt);
+      if (expTime < new Date()) {
+        showFileExpired();
+        return;
+      }
+    }
+
+    // 2. Password protection check
+    if (file.accessPassword && !window.unlockedFiles[file.id]) {
+      showPasswordPrompt(file, () => {
+        window.unlockedFiles[file.id] = true;
+        renderFileDetail(file);
+      });
       return;
     }
 
@@ -126,6 +146,9 @@ function renderFileDetail(file) {
   // Share URL
   const shareUrlEl = document.getElementById('share-url');
   if (shareUrlEl) shareUrlEl.value = window.location.href;
+
+  // Media Preview (Video, Audio, Image)
+  renderMediaPreview(file);
 }
 
 function startDownload(file) {
@@ -202,6 +225,96 @@ function showFileNotFound() {
       <div style="font-size:4rem;margin-bottom:20px">🔍</div>
       <h2 style="font-size:1.5rem;margin-bottom:12px">File Not Found</h2>
       <p style="color:var(--text-muted);margin-bottom:28px">This file may have been deleted or the link is invalid.</p>
+      <a href="index.html" class="btn btn-primary">Go Home</a>
+    </div>
+  `;
+}
+
+async function renderMediaPreview(file) {
+  const container = document.getElementById('media-preview-container');
+  if (!container) return;
+
+  const ext = (file.type || file.name.split('.').pop()).toLowerCase();
+
+  let targetUrl = file.downloadUrl;
+  if (file.storagePath && file.storagePath.startsWith('idb:')) {
+    const key = file.storagePath.replace('idb:', '');
+    if (typeof getIndexedDBFile === 'function') {
+      const blob = await getIndexedDBFile(key);
+      if (blob) targetUrl = URL.createObjectURL(blob);
+    }
+  }
+
+  if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) {
+    container.innerHTML = `
+      <div style="background:rgba(0,0,0,0.3);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:16px;margin:20px 0;text-align:center">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">🖼️ Image Preview</div>
+        <img src="${targetUrl}" alt="${escapeHTML(file.name)}" style="max-width:100%;max-height:360px;border-radius:var(--radius-md);object-fit:contain;box-shadow:var(--shadow-card)" />
+      </div>
+    `;
+    container.style.display = 'block';
+  } else if (['mp4', 'webm', 'mov'].includes(ext)) {
+    container.innerHTML = `
+      <div style="background:rgba(0,0,0,0.3);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:16px;margin:20px 0;text-align:center">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">🎬 Video Player</div>
+        <video controls style="width:100%;max-height:360px;border-radius:var(--radius-md)">
+          <source src="${targetUrl}">
+          Your browser does not support video preview.
+        </video>
+      </div>
+    `;
+    container.style.display = 'block';
+  } else if (['mp3', 'wav', 'ogg', 'm4a'].includes(ext)) {
+    container.innerHTML = `
+      <div style="background:rgba(0,0,0,0.3);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:16px;margin:20px 0;text-align:center">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">🎵 Audio Player</div>
+        <audio controls style="width:100%;margin-top:8px">
+          <source src="${targetUrl}">
+          Your browser does not support audio preview.
+        </audio>
+      </div>
+    `;
+    container.style.display = 'block';
+  }
+}
+
+function showPasswordPrompt(file, onSuccess) {
+  const main = document.getElementById('file-main');
+  if (!main) return;
+
+  main.innerHTML = `
+    <div style="max-width:440px;margin:80px auto;background:var(--bg-card);border:1px solid var(--glass-border);border-radius:var(--radius-xl);padding:32px;text-align:center;box-shadow:var(--shadow-card)">
+      <div style="font-size:3rem;margin-bottom:16px">🔒</div>
+      <h2 style="font-size:1.5rem;font-weight:800;margin-bottom:8px">Password Protected</h2>
+      <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:24px">This file requires a password to view or download.</p>
+      
+      <form id="pass-form">
+        <input type="password" id="file-pass-input" class="form-input" placeholder="Enter file password" style="margin-bottom:16px;text-align:center" required autofocus />
+        <button type="submit" class="btn btn-primary" style="width:100%">🔓 Access File</button>
+      </form>
+    </div>
+  `;
+
+  document.getElementById('pass-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = document.getElementById('file-pass-input').value;
+    if (input === file.accessPassword) {
+      showToast('Access granted! 🔓', 'success');
+      window.unlockedFiles[file.id] = true;
+      if (onSuccess) onSuccess();
+    } else {
+      showToast('Incorrect password ❌', 'error');
+    }
+  });
+}
+
+function showFileExpired() {
+  const main = document.getElementById('file-main');
+  if (main) main.innerHTML = `
+    <div style="text-align:center;padding:80px 20px">
+      <div style="font-size:4rem;margin-bottom:20px">⏳</div>
+      <h2 style="font-size:1.5rem;margin-bottom:12px">Link Expired</h2>
+      <p style="color:var(--text-muted);margin-bottom:28px">This shared file link has expired and is no longer available.</p>
       <a href="index.html" class="btn btn-primary">Go Home</a>
     </div>
   `;
