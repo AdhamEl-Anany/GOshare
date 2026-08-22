@@ -693,6 +693,23 @@ function renderPayPalButtons() {
             // Instantly upgrade user in Firestore
             await updateUserPlan(activeUser.uid, selectedPlan);
             
+            // Record transaction in Admin Panel history as auto-approved payment
+            try {
+              if (typeof requestPremiumUpgrade === 'function') {
+                const reqId = await requestPremiumUpgrade(
+                  activeUser.uid,
+                  activeUser.email,
+                  activeUser.name || activeUser.displayName || 'User',
+                  selectedPlan
+                );
+                if (reqId && typeof approveRequest === 'function') {
+                  await approveRequest(reqId, activeUser.uid, selectedPlan);
+                }
+              }
+            } catch (e) {
+              console.warn('Admin record logging notice:', e);
+            }
+
             // Also store offline fallback for instant local update
             const cached = JSON.parse(localStorage.getItem('goshare_user') || '{}');
             cached.plan = selectedPlan;
