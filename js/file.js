@@ -10,15 +10,29 @@ document.addEventListener('DOMContentLoaded', () => {
   const shortId = params.get('s');
 
   if (!shortId) {
-    showFileNotFound();
-    return;
+    // Render interactive demo file when file.html is opened directly
+    const demoFile = {
+      id: 'demo_file_001',
+      name: 'GOshare_Quick_Start_Guide.pdf',
+      size: 1457280,
+      type: 'pdf',
+      downloads: 128,
+      createdAt: new Date(),
+      downloadUrl: 'https://raw.githubusercontent.com/mozilla/pdf.js/master/web/compressed.tracemonkey-pldi-09.pdf',
+      shortId: 'demo'
+    };
+    renderFileDetail(demoFile);
+    document.getElementById('download-btn')?.addEventListener('click', () => {
+      startDownload(demoFile);
+    });
+  } else {
+    loadFileByShortId(shortId);
   }
 
-  loadFileByShortId(shortId);
-
-  // Copy link
+  // Copy link handler
   document.getElementById('copy-link-btn')?.addEventListener('click', () => {
-    copyToClipboard(window.location.href);
+    const url = document.getElementById('share-url')?.value || window.location.href;
+    copyToClipboard(url);
     if (typeof showToast === 'function') showToast('Share link copied to clipboard! 📋', 'success');
   });
 });
