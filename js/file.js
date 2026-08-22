@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-async function loadFileByShortId(shortId) {
+"async function loadFileByShortId(shortId) {
   try {
     const file = await getFileByShortId(shortId);
     if (!file) {
@@ -28,6 +28,9 @@ async function loadFileByShortId(shortId) {
     }
 
     renderFileDetail(file);
+
+    // Hide Ads if File Owner or Current Visitor is Premium (Pro / Business)
+    checkAndApplyNoAds(file);
 
     // Download button
     document.getElementById('download-btn')?.addEventListener('click', () => {
@@ -39,6 +42,44 @@ async function loadFileByShortId(shortId) {
     showFileNotFound();
   }
 }
+
+async function checkAndApplyNoAds(file) {
+  try {
+    // 1. Check if owner is premium
+    let isPremium = false;
+    if (file.ownerId) {
+      const ownerDoc = await getUserDoc(file.ownerId);
+      if (ownerDoc && (ownerDoc.plan === 'pro' || ownerDoc.plan === 'business')) {
+        isPremium = true;
+      }
+    }
+
+    // 2. Check if current visitor is logged in and premium
+    const currentUser = auth.currentUser;
+    if (currentUser && !isPremium) {
+      const userDoc = await getUserDoc(currentUser.uid);
+      if (userDoc && (userDoc.plan === 'pro' || userDoc.plan === 'business')) {
+        isPremium = true;
+      }
+    }
+
+    if (isPremium) {
+      console.log('💎 Premium Account Detected — Ads Disabled!');
+      document.querySelectorAll('.ad-slot-wrap').forEach(el => {
+        el.style.display = 'none';
+      });
+      // Add Premium Badge on file page
+      const titleEl = document.querySelector('.download-area');
+      if (titleEl) {
+        const badge = document.createElement('div');
+        badge.innerHTML = '<span style="background:rgba(0,200,83,0.15);color:var(--green-400);border:1px solid rgba(0,200,83,0.3);padding:4px 12px;border-radius:var(--radius-full);font-size:0.8rem;font-weight:700;display:inline-block;margin-bottom:12px">💎 Premium File — Ultra Fast & Ad-Free</span>';
+        titleEl.insertBefore(badge, titleEl.firstChild);
+      }
+    }
+  } catch (err) {
+    console.warn('Ad preference check notice:', err);
+  }
+}"
 
 function renderFileDetail(file) {
   document.title = `${file.name} – GOshare`;

@@ -472,33 +472,26 @@
 
 </main>
 
+"<!-- ══════════════════════════════════ -->
+<!--  PAYPAL & CARD PAYMENT MODAL       -->
 <!-- ══════════════════════════════════ -->
-<!--  INSTAPAY PAYMENT MODAL           -->
-<!-- ══════════════════════════════════ -->
-<div class="modal-overlay" id="instapay-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(12px);z-index:9999;align-items:center;justify-content:center;padding:20px">
-  <div class="modal-card" style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:var(--radius-xl);max-width:500px;width:100%;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,0.5);text-align:center">
-    <div style="font-size:2.5rem;margin-bottom:12px">💸</div>
-    <h2 style="font-size:1.5rem;font-weight:800;margin-bottom:8px">InstaPay Payment</h2>
-    <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:24px">Upgrade to <span id="modal-plan-title" style="color:var(--green-400);font-weight:700">Pro</span> Plan</p>
+<div class="modal-overlay" id="paypal-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(14px);z-index:9999;align-items:center;justify-content:center;padding:20px">
+  <div class="modal-card" style="background:var(--bg-card);border:1px solid var(--green-500);border-radius:var(--radius-xl);max-width:480px;width:100%;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(0,200,83,0.15);text-align:center">
+    <div style="font-size:2.8rem;margin-bottom:10px">💎</div>
+    <h2 style="font-size:1.6rem;font-weight:800;margin-bottom:6px">Secure Checkout</h2>
+    <p style="color:var(--text-muted);font-size:0.92rem;margin-bottom:20px">Subscribe to <span id="modal-plan-title" style="color:var(--green-400);font-weight:700">Pro</span> Plan — <strong id="modal-plan-price" style="color:#fff">$9/mo</strong></p>
 
-    <!-- Payment Steps -->
-    <div style="background:rgba(255,255,255,0.03);border:1px solid var(--bg-border);border-radius:var(--radius-lg);padding:20px;text-align:left;margin-bottom:24px">
-      <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">1. Send payment via <strong>InstaPay</strong>:</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(0,200,83,0.1);border:1px dashed var(--green-500);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:16px">
-        <code style="color:var(--green-400);font-size:1rem;font-weight:700">adhamhan0@instapay</code>
-        <button class="btn btn-sm btn-glass" onclick="copyToClipboard('adhamhan0@instapay')">📋 Copy</button>
+    <!-- Payment Container -->
+    <div style="background:rgba(255,255,255,0.03);border:1px solid var(--bg-border);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px">
+      <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:16px;text-align:left;display:flex;align-items:center;gap:8px">
+        <span>💳 Pay safely via Credit/Debit Card or PayPal</span>
       </div>
-
-      <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">2. Send payment screenshot & account email to WhatsApp:</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(77,208,225,0.1);border:1px dashed var(--diamond-400);border-radius:var(--radius-md);padding:12px 16px">
-        <span style="color:var(--diamond-400);font-size:0.95rem;font-weight:700">WhatsApp: @AdhamHany1</span>
-        <a href="https://wa.me/?text=Hello%20ENG.Adham%20Hany,%20I%20transferred%20the%20payment%20via%20InstaPay%20for%20GOshare%20subscription." target="_blank" class="btn btn-sm btn-diamond">💬 WhatsApp</a>
-      </div>
+      <!-- PayPal Smart Buttons container -->
+      <div id="paypal-button-container" style="min-height:120px"></div>
     </div>
 
     <div style="display:flex;gap:12px;justify-content:center">
-      <button class="btn btn-glass" id="close-instapay-modal" style="flex:1">Cancel</button>
-      <button class="btn btn-primary" id="confirm-instapay-btn" style="flex:1">Submit Request</button>
+      <button class="btn btn-glass" id="close-paypal-modal" style="width:100%">Cancel</button>
     </div>
   </div>
 </div>
@@ -536,6 +529,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<!-- PayPal SDK (Sandbox / Live ready) -->
+<script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
+
 <script src="js/firebase-config.js"></script>
 <script src="js/db.js"></script>
 <script src="js/utils.js"></script>
@@ -566,62 +562,95 @@ document.querySelectorAll('.faq-question').forEach(btn => {
   });
 });
 
-// ── InstaPay Premium Subscription Modal ──
+// ── PayPal Payment & Upgrade Logic ──
 let selectedPlan = 'pro';
+let selectedPrice = '9';
+let paypalRendered = false;
 
 document.querySelectorAll('.plan-btn').forEach(btn => {
   btn.addEventListener('click', (e) => {
     const card = btn.closest('.plan-card');
     const planName = card.querySelector('.plan-name').textContent.toLowerCase().trim();
-    if (planName === 'free') return; // Redirects to auth
+    if (planName === 'free') return; // Default free plan
 
     e.preventDefault();
+
+    const user = auth.currentUser;
+    if (!user) {
+      showToast('Please log in or sign up first to select a Premium plan', 'error');
+      setTimeout(() => window.location.href = 'auth.html', 1500);
+      return;
+    }
+
     selectedPlan = planName.includes('pro') ? 'pro' : 'business';
+    const isAnnual = toggle?.checked;
+    selectedPrice = selectedPlan === 'pro' ? (isAnnual ? '6' : '9') : (isAnnual ? '20' : '29');
+
     document.getElementById('modal-plan-title').textContent = selectedPlan === 'pro' ? 'Pro 💎' : 'Business 🏢';
-    document.getElementById('instapay-modal').style.display = 'flex';
+    document.getElementById('modal-plan-price').textContent = `$${selectedPrice}/mo`;
+
+    document.getElementById('paypal-modal').style.display = 'flex';
+    renderPayPalButtons();
   });
 });
 
-document.getElementById('close-instapay-modal')?.addEventListener('click', () => {
-  document.getElementById('instapay-modal').style.display = 'none';
+document.getElementById('close-paypal-modal')?.addEventListener('click', () => {
+  document.getElementById('paypal-modal').style.display = 'none';
 });
 
-document.getElementById('confirm-instapay-btn')?.addEventListener('click', async () => {
-  const user = auth.currentUser;
-  if (!user) {
-    showToast('Please log in first to request a premium upgrade', 'error');
-    setTimeout(() => window.location.href = 'auth.html', 1500);
-    return;
+function renderPayPalButtons() {
+  const container = document.getElementById('paypal-button-container');
+  container.innerHTML = ''; // Reset container
+
+  if (window.paypal) {
+    paypal.Buttons({
+      style: {
+        layout: 'vertical',
+        color:  'gold',
+        shape:  'rect',
+        label:  'paypal'
+      },
+      createOrder: function(data, actions) {
+        return actions.order.create({
+          purchase_units: [{
+            description: `GOshare Premium ${selectedPlan.toUpperCase()} Plan Subscription`,
+            amount: {
+              currency_code: 'USD',
+              value: selectedPrice
+            }
+          }]
+        });
+      },
+      onApprove: async function(data, actions) {
+        try {
+          const details = await actions.order.capture();
+          const user = auth.currentUser;
+          if (user) {
+            // Instantly upgrade user in Firestore
+            await updateUserPlan(user.uid, selectedPlan);
+            
+            // Also store offline fallback for instant local update
+            const cached = JSON.parse(localStorage.getItem('goshare_user') || '{}');
+            cached.plan = selectedPlan;
+            localStorage.setItem('goshare_user', JSON.stringify(cached));
+
+            showToast(`🎉 Payment successful! Account upgraded to ${selectedPlan.toUpperCase()}!`, 'success');
+            document.getElementById('paypal-modal').style.display = 'none';
+            setTimeout(() => window.location.href = 'dashboard.html', 2000);
+          }
+        } catch (err) {
+          showToast('Payment completed but updating profile failed: ' + err.message, 'error');
+        }
+      },
+      onError: function(err) {
+        console.error('PayPal Error:', err);
+        showToast('Payment processing error. Please try again.', 'error');
+      }
+    }).render('#paypal-button-container');
+  } else {
+    container.innerHTML = '<p style="color:var(--red-400)">Unable to load PayPal SDK</p>';
   }
-
-  try {
-    const btn = document.getElementById('confirm-instapay-btn');
-    btn.disabled = true;
-    btn.textContent = '⟳ Submitting…';
-
-    const userDoc = await getUserDoc(user.uid);
-
-    await createPremiumRequest({
-      userId: user.uid,
-      userEmail: user.email,
-      userName: userDoc?.name || user.displayName || 'User',
-      plan: selectedPlan
-    });
-
-    document.getElementById('instapay-modal').style.display = 'none';
-    btn.disabled = false;
-    btn.textContent = 'Submit Request';
-
-    showToast('Premium request submitted! Send your screenshot on WhatsApp @AdhamHany1', 'success');
-
-    // Open WhatsApp
-    const waText = encodeURIComponent(`Hello ENG.Adham Hany,\nI paid for the GOshare ${selectedPlan.toUpperCase()} plan via InstaPay (adhamhan0@instapay).\nMy Account Email: ${user.email}\nHere is my payment screenshot:`);
-    window.open(`https://wa.me/?text=${waText}`, '_blank');
-
-  } catch (e) {
-    showToast('Error submitting request: ' + e.message, 'error');
-  }
-});
-</script>
+}
+</script>"
 </body>
 </html>
