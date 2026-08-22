@@ -471,25 +471,32 @@
 <!-- ══════════════════════════════════ -->
 <!--  PAYPAL & CARD PAYMENT MODAL       -->
 <!-- ══════════════════════════════════ -->
-<div class="modal-overlay" id="paypal-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(14px);z-index:9999;align-items:center;justify-content:center;padding:20px">
+<!-- ══════════════════════════════════ -->
+<!--  PAYPAL & CARD PAYMENT MODAL       -->
+<!-- ══════════════════════════════════ -->
+<div class="modal-overlay" id="paypal-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(14px);z-index:99999;align-items:center;justify-content:center;padding:20px">
   <div class="modal-card" style="background:var(--bg-card);border:1px solid var(--green-500);border-radius:var(--radius-xl);max-width:480px;width:100%;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(0,200,83,0.15);text-align:center">
     <div style="font-size:2.8rem;margin-bottom:10px">💎</div>
-    <h2 style="font-size:1.6rem;font-weight:800;margin-bottom:6px">Secure Checkout</h2>
+    <h2 style="font-size:1.6rem;font-weight:800;margin-bottom:6px">Choose Payment Method</h2>
     <p style="color:var(--text-muted);font-size:0.92rem;margin-bottom:20px">Subscribe to <span id="modal-plan-title" style="color:var(--green-400);font-weight:700">Pro</span> Plan — <strong id="modal-plan-price" style="color:#fff">$9/mo</strong></p>
 
     <!-- Payment Container -->
     <div style="background:rgba(255,255,255,0.03);border:1px solid var(--bg-border);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px">
       <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:16px;text-align:left;display:flex;align-items:center;gap:8px">
-        <span>💳 Pay safely via Credit/Debit Card or PayPal</span>
+        <span>💳 Pay via Credit/Debit Card or PayPal:</span>
       </div>
       <!-- PayPal Smart Buttons container -->
       <div id="paypal-button-container" style="min-height:120px"></div>
 
       <!-- InstaPay / Vodafone Cash Info -->
       <div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--bg-border);font-size:0.82rem;color:var(--text-muted);text-align:left">
-        <p style="font-weight:700;color:var(--green-400);margin-bottom:4px">⚡ Alternative Local Payment (InstaPay):</p>
+        <p style="font-weight:700;color:var(--green-400);margin-bottom:4px">⚡ Pay via InstaPay (Egypt):</p>
         <p>Transfer to InstaPay: <strong style="color:#fff">adhamhan0@instapay</strong></p>
         <p>Send screenshot & email to WhatsApp: <a href="https://wa.me/20113000000?text=I%20want%20to%20upgrade%20my%20GOshare%20account" target="_blank" style="color:var(--green-400);text-decoration:underline">@AdhamHany1</a></p>
+        
+        <button type="button" class="btn btn-primary btn-sm" id="btn-instapay-submit" style="margin-top:12px;width:100%">
+          📩 Submit InstaPay Transfer Notification
+        </button>
       </div>
     </div>
 
@@ -569,42 +576,89 @@ document.querySelectorAll('.faq-question').forEach(btn => {
 let selectedPlan = 'pro';
 let selectedPrice = '9';
 
-document.querySelectorAll('.plan-btn').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    e.preventDefault();
+function openPayModal() {
+  const modal = document.getElementById('paypal-modal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  modal.style.opacity = '1';
+  modal.style.visibility = 'visible';
+  modal.style.pointerEvents = 'auto';
+  modal.classList.add('active');
+}
 
-    const card = btn.closest('.plan-card');
-    const planName = card.querySelector('.plan-name').textContent.toLowerCase().trim();
+function closePayModal() {
+  const modal = document.getElementById('paypal-modal');
+  if (!modal) return;
+  modal.classList.remove('active');
+  modal.style.opacity = '0';
+  modal.style.visibility = 'hidden';
+  modal.style.pointerEvents = 'none';
+  setTimeout(() => {
+    modal.style.display = 'none';
+  }, 300);
+}
 
-    // Check active user from Firebase or local cache
-    const activeUser = (typeof auth !== 'undefined' && auth.currentUser) || getUser();
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.plan-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
 
-    if (!activeUser) {
-      showToast('Please log in or sign up first to select a plan', 'info');
-      setTimeout(() => window.location.href = 'auth.html', 1200);
-      return;
-    }
+      const card = btn.closest('.plan-card');
+      const planName = card.querySelector('.plan-name').textContent.toLowerCase().trim();
 
-    if (planName === 'free') {
-      showToast('You are already on the Free plan! Redirecting to Dashboard...', 'info');
-      setTimeout(() => window.location.href = 'dashboard.html', 1000);
-      return;
-    }
+      // Check active user from Firebase or local cache
+      const activeUser = (typeof auth !== 'undefined' && auth.currentUser) || getUser();
 
-    selectedPlan = planName.includes('pro') ? 'pro' : 'business';
-    const isAnnual = toggle?.checked;
-    selectedPrice = selectedPlan === 'pro' ? (isAnnual ? '6' : '9') : (isAnnual ? '20' : '29');
+      if (!activeUser) {
+        showToast('Please log in or sign up first to select a plan', 'info');
+        setTimeout(() => window.location.href = 'auth.html', 1200);
+        return;
+      }
 
-    document.getElementById('modal-plan-title').textContent = selectedPlan === 'pro' ? 'Pro 💎' : 'Business 🏢';
-    document.getElementById('modal-plan-price').textContent = `$${selectedPrice}/mo`;
+      if (planName === 'free') {
+        showToast('You are already on the Free plan! Redirecting to Dashboard...', 'info');
+        setTimeout(() => window.location.href = 'dashboard.html', 1000);
+        return;
+      }
 
-    document.getElementById('paypal-modal').style.display = 'flex';
-    renderPayPalButtons();
+      selectedPlan = planName.includes('pro') ? 'pro' : 'business';
+      const isAnnual = toggle?.checked;
+      selectedPrice = selectedPlan === 'pro' ? (isAnnual ? '6' : '9') : (isAnnual ? '20' : '29');
+
+      document.getElementById('modal-plan-title').textContent = selectedPlan === 'pro' ? 'Pro 💎' : 'Business 🏢';
+      document.getElementById('modal-plan-price').textContent = `$${selectedPrice}/mo`;
+
+      openPayModal();
+      renderPayPalButtons();
+    });
   });
-});
 
-document.getElementById('close-paypal-modal')?.addEventListener('click', () => {
-  document.getElementById('paypal-modal').style.display = 'none';
+  document.getElementById('close-paypal-modal')?.addEventListener('click', closePayModal);
+
+  document.getElementById('paypal-modal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'paypal-modal') closePayModal();
+  });
+
+  // Submit InstaPay Transfer Notification
+  document.getElementById('btn-instapay-submit')?.addEventListener('click', async () => {
+    const activeUser = (typeof auth !== 'undefined' && auth.currentUser) || getUser();
+    if (!activeUser) return;
+    try {
+      if (typeof requestPremiumUpgrade === 'function') {
+        await requestPremiumUpgrade(
+          activeUser.uid,
+          activeUser.email,
+          activeUser.name || activeUser.displayName || 'User',
+          selectedPlan
+        );
+      }
+      showToast(`✅ Upgrade request for ${selectedPlan.toUpperCase()} plan submitted! Send transfer screenshot on WhatsApp @AdhamHany1 for instant approval.`, 'success', 5000);
+      closePayModal();
+    } catch (err) {
+      showToast('Submitted request, please contact Admin on WhatsApp: ' + err.message, 'info');
+      closePayModal();
+    }
+  });
 });
 
 function renderPayPalButtons() {
@@ -645,7 +699,7 @@ function renderPayPalButtons() {
             localStorage.setItem('goshare_user', JSON.stringify(cached));
 
             showToast(`🎉 Payment successful! Account upgraded to ${selectedPlan.toUpperCase()}!`, 'success');
-            document.getElementById('paypal-modal').style.display = 'none';
+            closePayModal();
             setTimeout(() => window.location.href = 'dashboard.html', 1800);
           }
         } catch (err) {
@@ -658,7 +712,7 @@ function renderPayPalButtons() {
       }
     }).render('#paypal-button-container');
   } else {
-    container.innerHTML = '<p style="color:var(--red-400)">Unable to load PayPal SDK</p>';
+    container.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem">💳 Card/PayPal checkout available. Or use InstaPay below!</p>';
   }
 }
 </script>
