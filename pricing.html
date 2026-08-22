@@ -283,7 +283,7 @@
 </head>
 <body>
 
-<!-- ── NAVBAR ── -->
+"<!-- ── NAVBAR ── -->
 <nav class="navbar" id="navbar">
   <div class="nav-inner">
     <a href="index.html" class="nav-logo">
@@ -295,13 +295,13 @@
       <li><a href="pricing.html">Pricing</a></li>
       <li><a href="dashboard.html">My Files</a></li>
     </ul>
-    <div class="nav-actions">
+    <div class="nav-actions" id="pricing-nav-actions">
       <a href="auth.html" class="btn btn-outline btn-sm">Log In</a>
       <a href="auth.html" class="btn btn-primary btn-sm">Get Started</a>
       <div class="nav-hamburger" id="nav-hamburger"><span></span><span></span><span></span></div>
     </div>
   </div>
-</nav>
+</nav>"
 
 <!-- ── PRICING PAGE ── -->
 <main class="pricing-page">
@@ -536,6 +536,17 @@
 <script src="js/db.js"></script>
 <script src="js/utils.js"></script>
 <script>
+"// ── Auth state check for Navbar ──
+auth.onAuthStateChanged(user => {
+  const navActions = document.getElementById('pricing-nav-actions');
+  if (user && navActions) {
+    navActions.innerHTML = `
+      <a href=\"dashboard.html\" class=\"btn btn-glass btn-sm\">📁 My Dashboard</a>
+      <span style=\"font-size:0.85rem;color:var(--green-400);font-weight:600\">👤 ${user.displayName || user.email.split('@')[0]}</span>
+    `;
+  }
+});
+
 // ── Billing Toggle ──
 const toggle = document.getElementById('billing-toggle');
 const amounts = document.querySelectorAll('.plan-amount');
@@ -565,7 +576,6 @@ document.querySelectorAll('.faq-question').forEach(btn => {
 // ── PayPal Payment & Upgrade Logic ──
 let selectedPlan = 'pro';
 let selectedPrice = '9';
-let paypalRendered = false;
 
 document.querySelectorAll('.plan-btn').forEach(btn => {
   btn.addEventListener('click', (e) => {
@@ -577,8 +587,8 @@ document.querySelectorAll('.plan-btn').forEach(btn => {
 
     const user = auth.currentUser;
     if (!user) {
-      showToast('Please log in or sign up first to select a Premium plan', 'error');
-      setTimeout(() => window.location.href = 'auth.html', 1500);
+      showToast('Please log in or sign up first to select a Premium plan', 'info');
+      setTimeout(() => window.location.href = 'auth.html', 1200);
       return;
     }
 
@@ -592,7 +602,7 @@ document.querySelectorAll('.plan-btn').forEach(btn => {
     document.getElementById('paypal-modal').style.display = 'flex';
     renderPayPalButtons();
   });
-});
+});"
 
 document.getElementById('close-paypal-modal')?.addEventListener('click', () => {
   document.getElementById('paypal-modal').style.display = 'none';
