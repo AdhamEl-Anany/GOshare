@@ -735,7 +735,19 @@ a:hover { color: var(--green-300); }
 }
 .modal-overlay.active .modal { transform: scale(1); }
 
-/* ── Responsive ── */
+/* ── Responsive & Mobile Touch UX ── */
+html, body {
+  overflow-x: hidden !important;
+  width: 100%;
+  max-width: 100vw;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+img, video, canvas, iframe, table, input, button {
+  max-width: 100%;
+}
+
 @media (max-width: 768px) {
   .nav-links { display: none; }
   .nav-hamburger { display: flex; }
@@ -744,9 +756,30 @@ a:hover { color: var(--green-300); }
     grid-template-columns: 1fr 1fr;
     gap: 32px;
   }
+
+  .hero-btns {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .hero-btns .btn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
 }
 
 @media (max-width: 480px) {
   .footer-grid { grid-template-columns: 1fr; }
-  .btn-lg { padding: 14px 28px; font-size: 1rem; }
+  .btn-lg { padding: 12px 20px; font-size: 0.95rem; width: 100%; }
+  .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+  
+  .hero-h1 {
+    font-size: 2rem !important;
+  }
+
+  .hero-p {
+    font-size: 0.95rem !important;
+  }
 }
+
