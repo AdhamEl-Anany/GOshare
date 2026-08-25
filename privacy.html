@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy – GOshare</title>
+  <meta name="description" content="GOshare Privacy Policy: Transparency on data collection, security, Firebase Cloud Storage practices, and account deletion for web & Android app users." />
+  <link rel="icon" type="image/jpeg" href="assets/images/logo-square.jpeg" />
+  <link rel="apple-touch-icon" href="assets/images/logo-square.jpeg" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .privacy-page {
+      padding: 120px 24px 80px;
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .privacy-glow-1 {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(0, 200, 83, 0.12) 0%, transparent 70%);
+      top: -150px;
+      left: -150px;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .privacy-glow-2 {
+      position: fixed;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(77, 208, 225, 0.1) 0%, transparent 70%);
+      bottom: -150px;
+      right: -100px;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .privacy-container {
+      max-width: 960px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .privacy-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .privacy-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 200, 83, 0.1);
+      border: 1px solid rgba(0, 200, 83, 0.3);
+      border-radius: var(--radius-full);
+      padding: 6px 18px;
+      font-size: 0.85rem;
+      color: var(--green-300);
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    .privacy-title {
+      font-size: clamp(2.2rem, 4vw, 3.2rem);
+      font-weight: 800;
+      margin-bottom: 16px;
+      background: var(--grad-hero);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .privacy-subtitle {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      max-width: 680px;
+      margin: 0 auto 20px;
+      line-height: 1.6;
+    }
+
+    .privacy-meta {
+      display: inline-block;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      padding: 6px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .privacy-card {
+      background: var(--bg-card);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-xl);
+      padding: 44px;
+      box-shadow: var(--shadow-card);
+      backdrop-filter: var(--glass-blur);
+    }
+
+    .privacy-section {
+      margin-bottom: 40px;
+    }
+
+    .privacy-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .privacy-section h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(0, 200, 83, 0.15);
+      padding-bottom: 10px;
+    }
+
+    .privacy-section h2 span.icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-md);
+      background: rgba(0, 200, 83, 0.12);
+      color: var(--green-400);
+      font-size: 1.1rem;
+    }
+
+    .privacy-section p {
+      color: var(--text-secondary);
+      line-height: 1.75;
+      font-size: 0.98rem;
+      margin-bottom: 14px;
+    }
+
+    .privacy-section ul {
+      margin: 14px 0 18px 24px;
+      color: var(--text-secondary);
+      line-height: 1.75;
+      font-size: 0.95rem;
+    }
+
+    .privacy-section li {
+      margin-bottom: 8px;
+    }
+
+    .privacy-section strong {
+      color: var(--text-primary);
+    }
+
+    .highlight-box {
+      background: rgba(0, 200, 83, 0.08);
+      border-left: 4px solid var(--green-400);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 16px 20px;
+      margin: 20px 0;
+    }
+
+    .highlight-box p {
+      margin: 0;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.92rem;
+    }
+
+    .data-table th,
+    .data-table td {
+      border: 1px solid var(--bg-border);
+      padding: 12px 16px;
+      text-align: left;
+    }
+
+    .data-table th {
+      background: rgba(0, 200, 83, 0.1);
+      color: var(--green-300);
+      font-weight: 600;
+    }
+
+    .data-table td {
+      color: var(--text-secondary);
+      background: var(--bg-card2);
+    }
+
+    .contact-card {
+      background: var(--grad-card);
+      border: 1px solid rgba(0, 200, 83, 0.25);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-top: 24px;
+    }
+
+    .contact-card p {
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .privacy-card {
+        padding: 24px 20px;
+      }
+
+      .privacy-section h2 {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── NAVBAR ── -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo" style="display:flex;align-items:center">
+        <img src="assets/images/logo-horizontal.jpeg" alt="GOshare" style="height:36px;object-fit:contain" />
+      </a>
+
+      <ul class="nav-links" id="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="pricing.html">Pricing</a></li>
+        <li><a href="dashboard.html">My Files</a></li>
+        <li><a href="privacy.html" class="active" style="color:var(--green-400);font-weight:700">Privacy Policy</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="auth.html" class="btn btn-outline btn-sm">Log In</a>
+        <a href="auth.html" class="btn btn-primary btn-sm">Get Started Free</a>
+        <div class="nav-hamburger" id="nav-hamburger">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── MAIN PRIVACY PAGE ── -->
+  <main class="privacy-page">
+    <div class="privacy-glow-1"></div>
+    <div class="privacy-glow-2"></div>
+
+    <div class="privacy-container">
+      <header class="privacy-header">
+        <div class="privacy-badge">🔒 Privacy & Data Protection Policy</div>
+        <h1 class="privacy-title">GOshare Privacy Policy</h1>
+        <p class="privacy-subtitle">
+          Transparent, secure, and compliant data management practices for GOshare Web Application and Android Mobile Application.
+        </p>
+        <div class="privacy-meta">Last Updated: August 25, 2026 | Applies to Web & Android App</div>
+      </header>
+
+      <article class="privacy-card">
+
+        <!-- 1. Introduction -->
+        <section class="privacy-section">
+          <h2><span class="icon">📜</span> 1. Overview & Scope</h2>
+          <p>
+            Welcome to <strong>GOshare</strong> ("we", "our", "us"). GOshare is a cloud file storage and sharing service accessible via our web application and Android mobile application (Package Name: <code>com.adhamelanany.goshare</code>). This service is developed and operated by <strong>ENG. Adham Hany</strong>.
+          </p>
+          <p>
+            We are committed to respecting your privacy, protecting your personal data, and maintaining full transparency regarding the collection, processing, storage, and deletion of your information in compliance with global standards and the <strong>Google Play Data Safety Policy</strong>.
+          </p>
+        </section>
+
+        <!-- 2. Data We Collect -->
+        <section class="privacy-section">
+          <h2><span class="icon">📂</span> 2. Data We Collect</h2>
+          <p>When you register, use, or interact with GOshare, we collect the following categories of data:</p>
+
+          <ul>
+            <li>
+              <strong>Account & Identification Data:</strong> Your email address, display name, user ID, and optional profile picture when creating an account via Email/Password, Google Sign-In, or GitHub Sign-In.
+            </li>
+            <li>
+              <strong>User Content & File Data:</strong> Files you upload (documents, images, videos, audio, archives), original file names, file sizes, MIME types, creation dates, expiration dates, and assigned security permissions (public, private, or password-protected).
+            </li>
+            <li>
+              <strong>App Activity & Usage Data:</strong> File upload counts, download metrics, storage quota utilization, and interaction logs within the app to provide dashboard analytics.
+            </li>
+            <li>
+              <strong>Technical & Device Data:</strong> Basic device information, IP address, user-agent string, and session tokens necessary for Firebase Authentication and fraud/abuse prevention.
+            </li>
+          </ul>
+        </section>
+
+        <!-- 3. How We Use Data -->
+        <section class="privacy-section">
+          <h2><span class="icon">⚙️</span> 3. How We Use Your Data</h2>
+          <p>We process your data strictly to deliver and improve our cloud sharing platform:</p>
+          <ul>
+            <li><strong>Authentication & Account Management:</strong> To verify your identity, maintain logged-in sessions, and enforce storage limits.</li>
+            <li><strong>File Hosting & Shortlink Generation:</strong> To store your files securely in Firebase Cloud Storage, generate short URLs, and manage download permissions.</li>
+            <li><strong>Security & Abuse Prevention:</strong> To protect against unauthorized access, XSS attacks, malicious file distribution, and spam.</li>
+            <li><strong>Customer Support & Communication:</strong> To respond to support requests, account inquiries, or security updates.</li>
+          </ul>
+        </section>
+
+        <!-- 4. Third-Party Services -->
+        <section class="privacy-section">
+          <h2><span class="icon">🌐</span> 4. Third-Party Services & Subprocessors</h2>
+          <p>
+            GOshare integrates trusted third-party service providers to power its infrastructure. These providers only process data as required to perform specific infrastructure tasks on our behalf:
+          </p>
+          <ul>
+            <li>
+              <strong>Google Firebase Services (Auth, Cloud Firestore, Cloud Storage):</strong> Provides secure user authentication, database metadata management, and encrypted file hosting. Data processed by Firebase is managed in accordance with <a href="https://policies.google.com/privacy" target="_blank" style="color:var(--green-400)">Google’s Privacy Policy</a>.
+            </li>
+            <li>
+              <strong>Monetag / Ad Networks:</strong> Non-personally identifiable advertising metrics to support free storage quotas.
+            </li>
+          </ul>
+          <p>We <strong>do not sell, rent, or trade</strong> your personal data or uploaded files to any third-party advertisers or data brokers.</p>
+        </section>
+
+        <!-- 5. Data Security -->
+        <section class="privacy-section">
+          <h2><span class="icon">🛡️</span> 5. Security Practices & Encryption</h2>
+          <p>We employ industry-standard technical and organizational security measures:</p>
+          <ul>
+            <li><strong>Encryption in Transit:</strong> All data transmitted between your device, our web/mobile apps, and Firebase servers is encrypted using HTTPS / TLS 1.3 protocols.</li>
+            <li><strong>Access Control & Granular Security Rules:</strong> Firebase Security Rules strictly restrict file access so that private files can only be accessed by the account owner.</li>
+            <li><strong>Password Protection:</strong> Password-protected file shares use server-side hash verification before granting access.</li>
+          </ul>
+        </section>
+
+        <!-- 6. Data Retention & Deletion Policy -->
+        <section class="privacy-section">
+          <h2><span class="icon">🗑️</span> 6. Data Retention & Account Deletion (Google Play Compliant)</h2>
+          <p>
+            You retain 100% ownership and control over your files and personal data at all times.
+          </p>
+
+          <div class="highlight-box">
+            <p>
+              <strong>Immediate File Deletion:</strong> You can delete any uploaded file at any time directly through the "My Files" section of your GOshare dashboard. Deleting a file instantly removes its binary data from Firebase Cloud Storage and deletes its record from Firestore.
+            </p>
+          </div>
+
+          <h3 style="color:var(--text-primary);margin:18px 0 10px;font-size:1.1rem">Account Deletion & Data Erasure Instructions:</h3>
+          <p>If you wish to delete your entire GOshare account and permanently remove all associated files, data, and metadata, you can do so through either of the following methods:</p>
+
+          <ul>
+            <li>
+              <strong>Method 1 (In-App Deletion):</strong> Log in to your GOshare account, navigate to <strong>My Files / Account Settings</strong>, and click <strong>"Delete Account"</strong>. This will trigger immediate purging of all stored files and user records.
+            </li>
+            <li>
+              <strong>Method 2 (Email / Contact Request):</strong> Send an email from your registered email address to <strong><a href="mailto:adham.cs.guides@gmail.com" style="color:var(--green-400)">adham.cs.guides@gmail.com</a></strong> with the subject <em>"GOshare Account Deletion Request"</em> or message our WhatsApp Support. Upon identity verification, all user records, authentication credentials, and uploaded files will be permanently purged within 7 business days.
+            </li>
+          </ul>
+        </section>
+
+        <!-- 7. Google Play Data Safety Summary -->
+        <section class="privacy-section">
+          <h2><span class="icon">📊</span> 7. Google Play Data Safety Summary</h2>
+          <p>For complete transparency with Android users downloading GOshare from Google Play, the table below summarizes our Data Safety disclosures:</p>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Data Category</th>
+                <th>Data Type</th>
+                <th>Collected / Shared</th>
+                <th>Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Personal Info</strong></td>
+                <td>Email Address, Name, User ID</td>
+                <td>Collected (Encrypted)</td>
+                <td>App functionality, Account authentication</td>
+              </tr>
+              <tr>
+                <td><strong>Files & Docs</strong></td>
+                <td>Uploaded User Files & Metadata</td>
+                <td>Collected (Encrypted)</td>
+                <td>Cloud file storage & user sharing</td>
+              </tr>
+              <tr>
+                <td><strong>App Info & Performance</strong></td>
+                <td>Crash logs, Diagnostics, Device Info</td>
+                <td>Collected (Encrypted)</td>
+                <td>Analytics, Security & Fraud prevention</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 8. Children's Privacy -->
+        <section class="privacy-section">
+          <h2><span class="icon">👶</span> 8. Children's Privacy</h2>
+          <p>
+            GOshare does not knowingly collect or solicit personal information from children under the age of 13. If we discover that a child under 13 has provided us with personal information, we will immediately delete such data from our servers. If you believe a child has provided us with personal data, please contact us.
+          </p>
+        </section>
+
+        <!-- 9. Changes to Policy -->
+        <section class="privacy-section">
+          <h2><span class="icon">🔄</span> 9. Updates to This Privacy Policy</h2>
+          <p>
+            We may update our Privacy Policy periodically to reflect service enhancements or legal requirements. Any modifications will be published directly on this page with an updated "Last Updated" date. Continued use of GOshare following modifications constitutes acceptance of the revised policy.
+          </p>
+        </section>
+
+        <!-- 10. Contact Us -->
+        <section class="privacy-section">
+          <h2><span class="icon">✉️</span> 10. Contact & Support</h2>
+          <p>If you have any questions, privacy concerns, or account deletion requests, please contact our lead developer:</p>
+
+          <div class="contact-card">
+            <p><strong>Developer & Data Controller:</strong> ENG. Adham Hany</p>
+            <p><strong>Official Email:</strong> <a href="mailto:adham.cs.guides@gmail.com" style="color:var(--green-400)">adham.cs.guides@gmail.com</a></p>
+            <p><strong>WhatsApp Support:</strong> <a href="https://wa.me/?text=GOshare%20Privacy%20Inquiry" target="_blank" style="color:var(--green-400)">Message Developer</a></p>
+            <p><strong>Source Code & Project:</strong> <a href="https://github.com/AdhamEl-Anany/GOshare" target="_blank" style="color:var(--green-400)">GitHub Repository</a></p>
+          </div>
+        </section>
+
+      </article>
+    </div>
+  </main>
+
+  <!-- ── FOOTER ── -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo" style="display:flex;align-items:center;margin-bottom:12px">
+          <img src="assets/images/logo-horizontal.jpeg" alt="GOshare" style="height:32px;object-fit:contain" />
+        </a>
+        <p>The fastest, most secure cloud file sharing platform. Developed & Managed by <strong>ENG.Adham Hany</strong>.</p>
+        <div class="footer-socials">
+          <a href="https://www.facebook.com/share/18zxWztWGU/?mibextid=wwXIfr" target="_blank" class="footer-social-btn" title="Facebook">📘</a>
+          <a href="https://www.tiktok.com/@adham_01130?_r=1&_t=ZS-98JYKSfhp2K" target="_blank" class="footer-social-btn" title="TikTok">🎵</a>
+          <a href="https://www.instagram.com/elanany.adham?igsh=Ymh0bTN0MHp3OWp1&utm_source=qr" target="_blank" class="footer-social-btn" title="Instagram">📸</a>
+          <a href="https://www.linkedin.com/in/adham-hany-93878933a?utm_source=share_via&utm_content=profile&utm_medium=member_ios" target="_blank" class="footer-social-btn" title="LinkedIn">💼</a>
+          <a href="https://github.com/AdhamEl-Anany" target="_blank" class="footer-social-btn" title="GitHub">💻</a>
+          <a href="https://www.youtube.com/channel/UCjukCoewJ849qKGY2-csxlw" target="_blank" class="footer-social-btn" title="YouTube">▶️</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="pricing.html">Pricing</a></li>
+          <li><a href="dashboard.html">My Files</a></li>
+          <li><a href="auth.html">Create Account</a></li>
+          <li><a href="privacy.html" style="color:var(--green-400);font-weight:700">Privacy Policy</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Developer</h4>
+        <ul>
+          <li><a href="https://github.com/AdhamEl-Anany" target="_blank">ENG.Adham Hany</a></li>
+          <li><a href="https://www.linkedin.com/in/adham-hany-93878933a" target="_blank">LinkedIn Profile</a></li>
+          <li><a href="https://wa.me/?text=Hello%20ENG.Adham%20Hany" target="_blank">Contact Developer</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal & Support</h4>
+        <ul>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="https://wa.me/?text=GOshare%20Support" target="_blank">WhatsApp Support</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 GOshare. All rights reserved. | Developed by <strong>ENG.Adham Hany</strong></p>
+      <p>Made with 💚 for the world</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+
+</html>
