@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delete Account & Data – GOshare</title>
+  <meta name="description" content="Request deletion of your GOshare account, uploaded files, and associated data for Web & Android App (com.adhamelanany.goshare)." />
+  <link rel="icon" type="image/jpeg" href="assets/images/logo-square.jpeg" />
+  <link rel="apple-touch-icon" href="assets/images/logo-square.jpeg" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .deletion-page {
+      padding: 120px 24px 80px;
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .deletion-glow-1 {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(255, 82, 82, 0.12) 0%, transparent 70%);
+      top: -150px;
+      left: -150px;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .deletion-glow-2 {
+      position: fixed;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(0, 200, 83, 0.1) 0%, transparent 70%);
+      bottom: -150px;
+      right: -100px;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .deletion-container {
+      max-width: 920px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .deletion-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .deletion-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 82, 82, 0.12);
+      border: 1px solid rgba(255, 82, 82, 0.3);
+      border-radius: var(--radius-full);
+      padding: 6px 18px;
+      font-size: 0.85rem;
+      color: #ff5252;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    .deletion-title {
+      font-size: clamp(2.2rem, 4vw, 3.2rem);
+      font-weight: 800;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #ffffff 0%, #ff5252 50%, #ff8a80 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .deletion-subtitle {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      max-width: 680px;
+      margin: 0 auto 20px;
+      line-height: 1.6;
+    }
+
+    .deletion-meta {
+      display: inline-block;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      padding: 6px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .deletion-card {
+      background: var(--bg-card);
+      border: 1px solid var(--bg-border);
+      border-radius: var(--radius-xl);
+      padding: 44px;
+      box-shadow: var(--shadow-card);
+      backdrop-filter: var(--glass-blur);
+    }
+
+    .deletion-section {
+      margin-bottom: 40px;
+    }
+
+    .deletion-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .deletion-section h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(0, 200, 83, 0.15);
+      padding-bottom: 10px;
+    }
+
+    .deletion-section h2 span.icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-md);
+      background: rgba(0, 200, 83, 0.12);
+      color: var(--green-400);
+      font-size: 1.1rem;
+    }
+
+    .deletion-section.danger-section h2 span.icon {
+      background: rgba(255, 82, 82, 0.15);
+      color: #ff5252;
+    }
+
+    .deletion-section p {
+      color: var(--text-secondary);
+      line-height: 1.75;
+      font-size: 0.98rem;
+      margin-bottom: 14px;
+    }
+
+    .deletion-section ul {
+      margin: 14px 0 18px 24px;
+      color: var(--text-secondary);
+      line-height: 1.75;
+      font-size: 0.95rem;
+    }
+
+    .deletion-section li {
+      margin-bottom: 8px;
+    }
+
+    .deletion-box {
+      background: rgba(0, 200, 83, 0.08);
+      border: 1px solid rgba(0, 200, 83, 0.2);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin: 20px 0;
+    }
+
+    .deletion-box.danger-box {
+      background: rgba(255, 82, 82, 0.08);
+      border-color: rgba(255, 82, 82, 0.3);
+    }
+
+    .deletion-box h3 {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      color: var(--text-primary);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #d32f2f 0%, #ff5252 100%);
+      color: #ffffff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: var(--transition);
+    }
+
+    .btn-danger:hover {
+      box-shadow: 0 0 25px rgba(255, 82, 82, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .form-control {
+      width: 100%;
+      background: var(--bg-card2);
+      border: 1px solid var(--bg-border);
+      color: var(--text-primary);
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .form-control:focus {
+      border-color: var(--green-400);
+    }
+
+    @media (max-width: 768px) {
+      .deletion-card {
+        padding: 24px 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── NAVBAR ── -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo" style="display:flex;align-items:center">
+        <img src="assets/images/logo-horizontal.jpeg" alt="GOshare" style="height:36px;object-fit:contain" />
+      </a>
+
+      <ul class="nav-links" id="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="pricing.html">Pricing</a></li>
+        <li><a href="dashboard.html">My Files</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="auth.html" class="btn btn-outline btn-sm">Log In</a>
+        <a href="auth.html" class="btn btn-primary btn-sm">Get Started Free</a>
+        <div class="nav-hamburger" id="nav-hamburger">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── MAIN DELETION PAGE ── -->
+  <main class="deletion-page">
+    <div class="deletion-glow-1"></div>
+    <div class="deletion-glow-2"></div>
+
+    <div class="deletion-container">
+      <header class="deletion-header">
+        <div class="deletion-badge">⚠️ Account & Data Deletion Portal</div>
+        <h1 class="deletion-title">Account & Data Deletion Request</h1>
+        <p class="deletion-subtitle">
+          Manage your data deletion rights for <strong>GOshare</strong> Web Platform & Android Application (Package ID: <code>com.adhamelanany.goshare</code>).
+        </p>
+        <div class="deletion-meta">Google Play Data Safety Compliant | Instant & External Web Request Options</div>
+      </header>
+
+      <article class="deletion-card">
+
+        <!-- 1. Delete Specific Data Without Deleting Account -->
+        <section class="deletion-section">
+          <h2><span class="icon">🗑️</span> 1. Delete Specific Data Without Deleting Your Account</h2>
+          <p>
+            GOshare empowers users to selectively delete individual files and data items at any time without closing or deleting their account:
+          </p>
+
+          <div class="deletion-box">
+            <h3>How to Delete Specific Files:</h3>
+            <ol style="margin-left: 20px; color: var(--text-secondary); line-height: 1.8;">
+              <li>Log in to your account at <a href="dashboard.html" style="color:var(--green-400)">GOshare Dashboard</a> or via the Android Mobile App.</li>
+              <li>Navigate to the <strong>"My Files"</strong> section.</li>
+              <li>Locate the file you wish to delete and click the <strong>"Delete" (🗑️)</strong> icon.</li>
+              <li>Confirm deletion. The file binary will be <strong>instantly purged from Firebase Cloud Storage</strong> and its metadata removed from Firestore.</li>
+            </ol>
+          </div>
+        </section>
+
+        <!-- 2. Full Account & Data Deletion -->
+        <section class="deletion-section danger-section">
+          <h2><span class="icon">⚠️</span> 2. Request Complete Account & Data Erasure</h2>
+          <p>
+            When you request account deletion, GOshare permanently purges all data associated with your user account across all backend systems.
+          </p>
+
+          <div class="deletion-box danger-box">
+            <h3 style="color:#ff5252">What Data is Permanently Deleted?</h3>
+            <ul>
+              <li><strong>User Profile & Credentials:</strong> Email address, display name, user ID, and authentication tokens in Firebase Authentication.</li>
+              <li><strong>Uploaded Files:</strong> All documents, photos, videos, and archives stored in Firebase Cloud Storage.</li>
+              <li><strong>Database Records:</strong> All file metadata, custom short URLs, download counts, and access permissions stored in Firestore.</li>
+              <li><strong>Local Storage Cache:</strong> All cached session data on your local device.</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- 3. Web-Based Execution Tools -->
+        <section class="deletion-section">
+          <h2><span class="icon">⚡</span> 3. Execute or Submit Deletion Request</h2>
+          <p>
+            Google Play policies require that you can request account deletion directly from the web without needing to reinstall or use the Android app. Choose one of the options below:
+          </p>
+
+          <!-- Interactive tool if logged in -->
+          <div id="logged-in-deletion-tool" class="deletion-box danger-box" style="display:none;">
+            <h3 style="color:#ff5252">Direct Account & Data Purge (Logged In User)</h3>
+            <p>You are currently logged in as: <strong id="logged-in-user-email" style="color:var(--text-primary)"></strong></p>
+            <p style="font-size:0.9rem;color:var(--text-muted)">
+              Clicking the button below will immediately delete all your uploaded files, database records, and authentication account from GOshare. This action cannot be reversed.
+            </p>
+            <button id="btn-purge-account" class="btn-danger" style="margin-top:12px">
+              🔴 Permanently Delete My Account & All Files Now
+            </button>
+          </div>
+
+          <!-- Web Request Form if not logged in -->
+          <div id="web-request-form-card" class="deletion-box">
+            <h3>Web Account Deletion Request Form</h3>
+            <p>If you cannot access your account or are requesting deletion externally, fill out the form below or email us directly:</p>
+
+            <form id="deletion-request-form" onsubmit="handleDeletionFormSubmit(event)">
+              <div class="form-group">
+                <label for="req-email">Registered Account Email Address *</label>
+                <input type="email" id="req-email" class="form-control" placeholder="name@example.com" required />
+              </div>
+              <div class="form-group">
+                <label for="req-reason">Reason for Deletion / Additional Details (Optional)</label>
+                <textarea id="req-reason" class="form-control" rows="3" placeholder="Please describe your request..."></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary btn-md">
+                📩 Send Deletion Request
+              </button>
+            </form>
+
+            <div id="form-feedback" style="display:none;margin-top:14px;padding:12px;border-radius:8px;font-size:0.9rem"></div>
+          </div>
+        </section>
+
+        <!-- 4. Data Retention Policy -->
+        <section class="deletion-section">
+          <h2><span class="icon">🕒</span> 4. Data Retention & Policy Clarifications</h2>
+          <p>
+            <strong>Instant Purge:</strong> Upon confirmation of deletion, user profile information, authentication credentials, and uploaded files are deleted immediately from active storage.
+          </p>
+          <p>
+            <strong>Temporary Retention:</strong> Server access logs (such as IP addresses and rate-limit logs used strictly for DDoS protection and fraud prevention) may be retained for up to 30 days in backup logs before automated permanent purging. We do not retain user files or personal information after account deletion.
+          </p>
+        </section>
+
+        <!-- 5. Contact -->
+        <section class="deletion-section">
+          <h2><span class="icon">✉️</span> 5. Developer Contact</h2>
+          <p>For urgent inquiries or privacy assistance regarding data deletion, contact our lead engineer:</p>
+          <p>
+            <strong>Developer:</strong> ENG. Adham Hany<br />
+            <strong>Email:</strong> <a href="mailto:adham.cs.guides@gmail.com" style="color:var(--green-400)">adham.cs.guides@gmail.com</a><br />
+            <strong>Support WhatsApp:</strong> <a href="https://wa.me/?text=GOshare%20Data%20Deletion%20Request" target="_blank" style="color:var(--green-400)">Direct Chat</a>
+          </p>
+        </section>
+
+      </article>
+    </div>
+  </main>
+
+  <!-- ── FOOTER ── -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo" style="display:flex;align-items:center;margin-bottom:12px">
+          <img src="assets/images/logo-horizontal.jpeg" alt="GOshare" style="height:32px;object-fit:contain" />
+        </a>
+        <p>The fastest, most secure cloud file sharing platform. Developed & Managed by <strong>ENG.Adham Hany</strong>.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="pricing.html">Pricing</a></li>
+          <li><a href="dashboard.html">My Files</a></li>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="delete-account.html" style="color:#ff5252;font-weight:700">Delete Account & Data</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Developer & Support</h4>
+        <ul>
+          <li><a href="https://github.com/AdhamEl-Anany" target="_blank">ENG.Adham Hany</a></li>
+          <li><a href="mailto:adham.cs.guides@gmail.com">adham.cs.guides@gmail.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 GOshare. All rights reserved. | Developed by <strong>ENG.Adham Hany</strong></p>
+    </div>
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/storage-adapter.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/utils.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      auth.onAuthStateChanged(user => {
+        const loggedInBox = document.getElementById('logged-in-deletion-tool');
+        const userEmailSpan = document.getElementById('logged-in-user-email');
+        if (user) {
+          loggedInBox.style.display = 'block';
+          userEmailSpan.textContent = user.email || user.uid;
+        } else {
+          loggedInBox.style.display = 'none';
+        }
+      });
+
+      const btnPurge = document.getElementById('btn-purge-account');
+      if (btnPurge) {
+        btnPurge.addEventListener('click', async () => {
+          const confirm1 = confirm('⚠️ WARNING: Are you sure you want to permanently delete your GOshare account and ALL uploaded files? This action cannot be undone.');
+          if (!confirm1) return;
+
+          const confirm2 = prompt('Type DELETE to confirm account permanent deletion:');
+          if (confirm2 !== 'DELETE') {
+            alert('Deletion cancelled. Confirmation text did not match.');
+            return;
+          }
+
+          try {
+            btnPurge.disabled = true;
+            btnPurge.textContent = '⏳ Deleting files and account data...';
+            const currentUser = auth.currentUser;
+            if (!currentUser) throw new Error('Not authenticated');
+
+            const uid = currentUser.uid;
+
+            // Delete all user files
+            const files = await getUserFiles(uid);
+            for (const f of files) {
+              if (f.storagePath) {
+                try { await deleteFileFromStorage(f.storagePath); } catch(e){}
+              }
+              await deleteFileDoc(f.id);
+            }
+
+            // Delete user doc from firestore
+            try { await db.collection('users').doc(uid).delete(); } catch(e){}
+
+            // Delete auth account
+            await currentUser.delete();
+
+            alert('✅ Your GOshare account and all associated files have been permanently deleted.');
+            window.location.href = 'index.html';
+          } catch (error) {
+            console.error('Account deletion error:', error);
+            if (error.code === 'auth/requires-recent-login') {
+              alert('🔒 Security Notice: Deleting your account requires a recent login. Please log out, log in again, and retry.');
+            } else {
+              alert('Error during account deletion: ' + error.message);
+            }
+            btnPurge.disabled = false;
+            btnPurge.textContent = '🔴 Permanently Delete My Account & All Files Now';
+          }
+        });
+      }
+    });
+
+    function handleDeletionFormSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('req-email').value;
+      const reason = document.getElementById('req-reason').value;
+      const feedback = document.getElementById('form-feedback');
+
+      const mailtoUrl = `mailto:adham.cs.guides@gmail.com?subject=GOshare%20Account%20Deletion%20Request%20(${encodeURIComponent(email)})&body=${encodeURIComponent("Account Deletion Request for: " + email + "\n\nDetails:\n" + reason)}`;
+      
+      window.location.href = mailtoUrl;
+
+      feedback.style.display = 'block';
+      feedback.style.background = 'rgba(0, 200, 83, 0.15)';
+      feedback.style.border = '1px solid rgba(0, 200, 83, 0.3)';
+      feedback.style.color = 'var(--text-primary)';
+      feedback.innerHTML = `✅ Deletion request initiated for <strong>${email}</strong>! Opening your email client to send the request to <strong>adham.cs.guides@gmail.com</strong>. Your data will be deleted within 7 business days upon identity verification.`;
+    }
+  </script>
+
+</body>
+
+</html>

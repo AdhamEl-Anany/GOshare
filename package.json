@@ -4,7 +4,7 @@
   "description": "GOshare Cloud Sharing Android & Web Platform",
   "main": "index.js",
   "scripts": {
-    "build": "node -e \"const fs=require('fs'); fs.mkdirSync('www',{recursive:true}); ['index.html','auth.html','dashboard.html','file.html','pricing.html','admin.html','privacy.html'].forEach(f=>fs.copyFileSync(f,'www/'+f)); ['css','js','assets'].forEach(d=>fs.cpSync(d,'www/'+d,{recursive:true}));\"",
+    "build": "node -e \"const fs=require('fs'); fs.mkdirSync('www',{recursive:true}); ['index.html','auth.html','dashboard.html','file.html','pricing.html','admin.html','privacy.html','delete-account.html'].forEach(f=>fs.copyFileSync(f,'www/'+f)); ['css','js','assets'].forEach(d=>fs.cpSync(d,'www/'+d,{recursive:true}));\"",
     "cap:sync": "npm run build && npx cap sync android",
     "cap:open": "npx cap open android"
   },
