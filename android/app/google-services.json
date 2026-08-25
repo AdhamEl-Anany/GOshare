@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:962464942390:android:1c440b6a81e174cad70b97",
+        "mobilesdk_app_id": "1:962464942390:android:f53d31b4b34cd034d70b97",
         "android_client_info": {
-          "package_name": "com.goshare.app"
+          "package_name": "com.adhamelanany.goshare"
         }
       },
       "oauth_client": [

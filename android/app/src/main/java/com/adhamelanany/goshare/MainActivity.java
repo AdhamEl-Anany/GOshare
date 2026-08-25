@@ -1,4 +1,4 @@
-package com.goshare.app;
+package com.adhamelanany.goshare;
 
 import com.getcapacitor.BridgeActivity;
 
