@@ -357,3 +357,39 @@ async function getPublicPlatformStats() {
     return { totalUsers: 0, totalFiles: 0, totalStorage: 0 };
   }
 }
+
+// ── Account & Data Purge (Google Play Compliant) ──
+async function deleteUserAccountAndData(uid) {
+  const currentUser = auth.currentUser;
+  if (!currentUser || currentUser.uid !== uid) {
+    throw new Error('User not authenticated');
+  }
+
+  // 1. Purge all user files from Cloud Storage & Firestore
+  try {
+    const files = await getUserFiles(uid);
+    for (const f of files) {
+      if (f.storagePath) {
+        try { await deleteFileFromStorage(f.storagePath); } catch (e) {}
+      }
+      await deleteFileDoc(f.id);
+    }
+  } catch (e) {
+    console.warn('Error purging user files:', e);
+  }
+
+  // 2. Delete user record from Firestore
+  try {
+    await db.collection('users').doc(uid).delete();
+  } catch (e) {
+    console.warn('Error deleting user record:', e);
+  }
+
+  // 3. Clear local storage cache
+  localStorage.removeItem('goshare_user');
+  localStorage.removeItem('goshare_files_fallback');
+
+  // 4. Delete user account from Firebase Auth
+  await currentUser.delete();
+}
+

@@ -36,13 +36,14 @@
           <span data-user-name>User</span>
           ▾
         </button>
-        <div id="user-dropdown" style="display:none;position:absolute;right:0;top:calc(100% + 8px);background:var(--bg-card2);border:1px solid var(--glass-border);border-radius:var(--radius-md);padding:6px;min-width:180px;z-index:200;box-shadow:var(--shadow-card)">
+        <div id="user-dropdown" style="display:none;position:absolute;right:0;top:calc(100% + 8px);background:var(--bg-card2);border:1px solid var(--glass-border);border-radius:var(--radius-md);padding:6px;min-width:210px;z-index:200;box-shadow:var(--shadow-card)">
           <div style="padding:10px 14px;border-bottom:1px solid var(--bg-border);margin-bottom:4px">
             <div style="font-size:0.85rem;font-weight:600" data-user-name>User</div>
             <div style="font-size:0.78rem;color:var(--text-muted)" data-user-email>email</div>
           </div>
           <a href="pricing.html" class="context-menu-item">💎 &nbsp; Upgrade Plan</a>
-          <a href="delete-account.html" class="context-menu-item" style="color:#ff5252">⚠️ &nbsp; Delete Account & Data</a>
+          <div class="context-menu-item" onclick="openAccountSettingsModal()">⚙️ &nbsp; Account & Privacy</div>
+          <div class="context-menu-item" onclick="triggerAccountDeletion()" style="color:#ff5252">⚠️ &nbsp; Delete Account & Data</div>
           <div class="context-menu-item" onclick="globalLogout('index.html')">🚪 &nbsp; Logout</div>
         </div>
       </div>
@@ -85,9 +86,15 @@
         <span class="link-icon">🗜️</span> Archives
       </a>
 
-      <div class="sidebar-section-label" style="margin-top:8px">Quick Access</div>
+      <div class="sidebar-section-label" style="margin-top:8px">Quick Access & Account</div>
       <a href="pricing.html" class="sidebar-link">
         <span class="link-icon">💎</span> Upgrade Plan
+      </a>
+      <a href="#" class="sidebar-link" onclick="openAccountSettingsModal();return false;">
+        <span class="link-icon">⚙️</span> Settings & Privacy
+      </a>
+      <a href="#" class="sidebar-link" onclick="triggerAccountDeletion();return false;" style="color:#ff5252">
+        <span class="link-icon">⚠️</span> Delete Account & Data
       </a>
     </div>
 
@@ -247,6 +254,50 @@
   </div>
 </div>
 
+<!-- ACCOUNT SETTINGS & PRIVACY MODAL -->
+<div class="modal-overlay" id="account-settings-modal">
+  <div class="modal" style="max-width:520px;padding:28px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;border-bottom:1px solid var(--bg-border);padding-bottom:12px">
+      <h3 style="font-size:1.25rem;display:flex;align-items:center;gap:10px;margin:0;color:var(--text-primary)">
+        <span>⚙️</span> Account & Data Settings
+      </h3>
+      <button class="btn btn-glass btn-icon" onclick="closeAccountSettingsModal()" style="width:32px;height:32px;border-radius:50%">✕</button>
+    </div>
+
+    <div style="background:var(--bg-card2);border:1px solid var(--glass-border);border-radius:var(--radius-md);padding:16px;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:48px;height:48px;border-radius:50%;background:var(--grad-green);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:700;flex-shrink:0">👤</div>
+        <div style="overflow:hidden">
+          <div style="font-weight:700;font-size:1.05rem;color:var(--text-primary)" data-user-name>User</div>
+          <div style="font-size:0.85rem;color:var(--text-muted);word-break:break-all" data-user-email>user@example.com</div>
+          <div style="font-size:0.78rem;color:var(--green-400);margin-top:4px;font-weight:600">Plan: Free (10 GB Cloud Storage)</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+      <a href="privacy.html" class="btn btn-glass" style="justify-content:flex-start;gap:12px;font-size:0.9rem">
+        🔒 View Privacy & Data Protection Policy
+      </a>
+      <a href="delete-account.html" class="btn btn-glass" style="justify-content:flex-start;gap:12px;font-size:0.9rem">
+        🌐 Public Account Deletion Web Portal
+      </a>
+    </div>
+
+    <div style="background:rgba(255,82,82,0.08);border:1px solid rgba(255,82,82,0.3);border-radius:var(--radius-lg);padding:18px">
+      <h4 style="color:#ff5252;margin:0 0 6px 0;font-size:0.95rem;display:flex;align-items:center;gap:8px">
+        <span>⚠️</span> Danger Zone — Account Deletion
+      </h4>
+      <p style="color:var(--text-secondary);font-size:0.85rem;line-height:1.5;margin-bottom:14px">
+        Permanently delete your GOshare account, all uploaded files from cloud storage, database records, and authentication profile.
+      </p>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;background:linear-gradient(135deg,#d32f2f,#ff5252);border:none;font-weight:700;padding:10px 16px" onclick="triggerAccountDeletion()">
+        🔴 Delete My Account & All Data
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -269,6 +320,49 @@
     const dd = document.getElementById('user-dropdown');
     if (dd) dd.style.display = 'none';
   });
+
+  // Account Settings Modal handlers
+  function openAccountSettingsModal() {
+    const modal = document.getElementById('account-settings-modal');
+    if (modal) modal.style.display = 'flex';
+  }
+
+  function closeAccountSettingsModal() {
+    const modal = document.getElementById('account-settings-modal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  async function triggerAccountDeletion() {
+    closeAccountSettingsModal();
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      alert('Please log in first to delete your account.');
+      return;
+    }
+
+    const confirm1 = confirm('⚠️ PERMANENT ACCOUNT DELETION:\n\nAre you sure you want to delete your GOshare account and ALL uploaded files?\n\nThis will permanently purge your files from Cloud Storage and delete your user profile.');
+    if (!confirm1) return;
+
+    const confirm2 = prompt('Type DELETE to confirm permanent account deletion:');
+    if (confirm2 !== 'DELETE') {
+      alert('Deletion cancelled. Confirmation text did not match.');
+      return;
+    }
+
+    try {
+      showToast('⏳ Deleting all your files and account data...', 'info');
+      await deleteUserAccountAndData(currentUser.uid);
+      alert('✅ Your GOshare account and all associated files have been permanently deleted.');
+      window.location.href = 'index.html';
+    } catch (error) {
+      console.error('Account deletion error:', error);
+      if (error.code === 'auth/requires-recent-login') {
+        alert('🔒 Security Notice: Account deletion requires recent authentication. Please log out, log back in, and try again.');
+      } else {
+        alert('Error during account deletion: ' + error.message);
+      }
+    }
+  }
 
   // Sidebar filter trigger
   function triggerFilter(e, filter) {
