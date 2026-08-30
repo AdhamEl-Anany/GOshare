@@ -13,6 +13,9 @@ async function createUserDoc(uid, data) {
     plan: data.plan || 'free',
     role: data.role || 'user',
     storageUsed: 0,
+    bonusStorage: data.bonusStorage || 0,
+    referredBy: data.referredBy || null,
+    referralCount: data.referralCount || 0,
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
 }

@@ -311,12 +311,37 @@ async function loginWithGoogle() {
     // Create user doc if missing
     let userDoc = await getUserDoc(user.uid);
     if (!userDoc) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const refUid = urlParams.get('ref');
+      const bonusInitial = refUid ? (2 * 1024 * 1024 * 1024) : 0;
+
       await createUserDoc(user.uid, {
         name: user.displayName || user.email.split('@')[0],
         email: user.email,
         plan: 'free',
-        role: user.email === ADMIN_EMAIL ? 'admin' : 'user'
+        role: user.email === ADMIN_EMAIL ? 'admin' : 'user',
+        bonusStorage: bonusInitial,
+        referredBy: refUid || null
       });
+
+      // Reward referrer with +2 GB bonus storage
+      if (refUid) {
+        try {
+          const referrerRef = db.collection('users').doc(refUid);
+          const referrerDoc = await referrerRef.get();
+          if (referrerDoc.exists) {
+            const currentBonus = referrerDoc.data().bonusStorage || 0;
+            const currentCount = referrerDoc.data().referralCount || 0;
+            await referrerRef.update({
+              bonusStorage: currentBonus + (2 * 1024 * 1024 * 1024),
+              referralCount: currentCount + 1
+            });
+            console.log(`🎁 Referral bonus +2GB awarded to referrer: ${refUid}`);
+          }
+        } catch (refErr) {
+          console.warn('Referral reward notice:', refErr);
+        }
+      }
     }
 
     showToast(`Welcome, ${user.displayName || 'User'}! 🎉`, 'success');
@@ -342,12 +367,37 @@ async function loginWithGithub() {
     // Create user doc if missing
     let userDoc = await getUserDoc(user.uid);
     if (!userDoc) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const refUid = urlParams.get('ref');
+      const bonusInitial = refUid ? (2 * 1024 * 1024 * 1024) : 0;
+
       await createUserDoc(user.uid, {
         name: user.displayName || user.email.split('@')[0],
         email: user.email,
         plan: 'free',
-        role: user.email === ADMIN_EMAIL ? 'admin' : 'user'
+        role: user.email === ADMIN_EMAIL ? 'admin' : 'user',
+        bonusStorage: bonusInitial,
+        referredBy: refUid || null
       });
+
+      // Reward referrer with +2 GB bonus storage
+      if (refUid) {
+        try {
+          const referrerRef = db.collection('users').doc(refUid);
+          const referrerDoc = await referrerRef.get();
+          if (referrerDoc.exists) {
+            const currentBonus = referrerDoc.data().bonusStorage || 0;
+            const currentCount = referrerDoc.data().referralCount || 0;
+            await referrerRef.update({
+              bonusStorage: currentBonus + (2 * 1024 * 1024 * 1024),
+              referralCount: currentCount + 1
+            });
+            console.log(`🎁 Referral bonus +2GB awarded to referrer: ${refUid}`);
+          }
+        } catch (refErr) {
+          console.warn('Referral reward notice:', refErr);
+        }
+      }
     }
 
     showToast(`Welcome, ${user.displayName || 'User'}! 🎉`, 'success');
