@@ -191,6 +191,12 @@ function renderUserInfo(userDoc) {
   document.querySelectorAll('[data-storage-max]').forEach(el => el.textContent = formatSize(max));
   document.querySelectorAll('[data-storage-pct]').forEach(el => el.textContent = pct + '%');
   document.getElementById('sidebar-file-count').textContent = allFiles.length;
+
+  // Real-time referral info
+  const rc = document.getElementById('dash-referral-count');
+  const rb = document.getElementById('dash-referral-bonus');
+  if (rc) rc.textContent = u.referralCount || 0;
+  if (rb) rb.textContent = formatSize(u.bonusStorage || 0);
 }
 
 function copyReferralLink() {

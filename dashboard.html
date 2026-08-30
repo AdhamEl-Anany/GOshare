@@ -138,7 +138,12 @@
           Referral Bonus Program
         </div>
         <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:4px;color:var(--text-primary)">Earn +2 GB Extra Free Storage per Friend!</h3>
-        <p style="color:var(--text-secondary);font-size:0.85rem;margin:0">Invite your friends to GOshare using your unique referral link. For every friend who registers, you both get +2 GB bonus space.</p>
+        <p style="color:var(--text-secondary);font-size:0.85rem;margin:0 0 10px 0">Invite your friends to GOshare using your unique referral link. For every friend who registers, you both get +2 GB bonus space.</p>
+        <div style="display:flex;gap:12px;font-size:0.82rem;flex-wrap:wrap">
+          <span style="color:var(--text-muted)">Friends Invited: <strong style="color:var(--green-400)" id="dash-referral-count">0</strong></span>
+          <span style="color:var(--text-muted)">•</span>
+          <span style="color:var(--text-muted)">Bonus Storage Earned: <strong style="color:var(--green-400)" id="dash-referral-bonus">0 GB</strong></span>
+        </div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <input type="text" id="referral-link-input" readonly style="background:var(--bg-card2);border:1px solid var(--glass-border);border-radius:var(--radius-md);padding:8px 12px;color:var(--green-400);font-size:0.85rem;font-family:monospace;width:260px" value="Loading link..." />
