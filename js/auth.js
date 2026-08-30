@@ -144,7 +144,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Check if user registered via referral link
         const urlParams = new URLSearchParams(window.location.search);
-        const refUid = urlParams.get('ref');
+        const refVal = urlParams.get('ref');
+        const refUid = (refVal && refVal !== 'undefined' && refVal !== 'null' && refVal.trim().length > 5) ? refVal.trim() : null;
         const bonusInitial = refUid ? (2 * 1024 * 1024 * 1024) : 0; // +2 GB for joining via referral!
 
         // Create user document in Firestore
@@ -312,7 +313,8 @@ async function loginWithGoogle() {
     let userDoc = await getUserDoc(user.uid);
     if (!userDoc) {
       const urlParams = new URLSearchParams(window.location.search);
-      const refUid = urlParams.get('ref');
+      const refVal = urlParams.get('ref');
+      const refUid = (refVal && refVal !== 'undefined' && refVal !== 'null' && refVal.trim().length > 5) ? refVal.trim() : null;
       const bonusInitial = refUid ? (2 * 1024 * 1024 * 1024) : 0;
 
       await createUserDoc(user.uid, {
@@ -368,7 +370,8 @@ async function loginWithGithub() {
     let userDoc = await getUserDoc(user.uid);
     if (!userDoc) {
       const urlParams = new URLSearchParams(window.location.search);
-      const refUid = urlParams.get('ref');
+      const refVal = urlParams.get('ref');
+      const refUid = (refVal && refVal !== 'undefined' && refVal !== 'null' && refVal.trim().length > 5) ? refVal.trim() : null;
       const bonusInitial = refUid ? (2 * 1024 * 1024 * 1024) : 0;
 
       await createUserDoc(user.uid, {
