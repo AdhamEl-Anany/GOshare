@@ -38,6 +38,13 @@ document.addEventListener('DOMContentLoaded', () => {
     renderStats();
     renderFiles();
 
+    // Populate Referral Link
+    const refInput = document.getElementById('referral-link-input');
+    if (refInput) {
+      const baseUrl = window.location.origin + window.location.pathname.replace('dashboard.html', 'auth.html');
+      refInput.value = `${baseUrl}?ref=${user.uid}`;
+    }
+
     // Upload zone
     initUploadZone();
 
@@ -132,7 +139,8 @@ function renderUserInfo(userDoc) {
   // Storage
   const used = allFiles.reduce((sum, f) => sum + (f.size || 0), 0);
   const maxMap = { free: 10*1024*1024*1024, pro: 50*1024*1024*1024, business: 1024*1024*1024*1024 };
-  const max = maxMap[u.plan] || maxMap.free;
+  const bonus = u.bonusStorage || 0;
+  const max = (maxMap[u.plan] || maxMap.free) + bonus;
   const pct = Math.min((used / max) * 100, 100).toFixed(1);
 
   document.querySelectorAll('[data-storage-fill]').forEach(el => el.style.width = pct + '%');
@@ -140,6 +148,24 @@ function renderUserInfo(userDoc) {
   document.querySelectorAll('[data-storage-max]').forEach(el => el.textContent = formatSize(max));
   document.querySelectorAll('[data-storage-pct]').forEach(el => el.textContent = pct + '%');
   document.getElementById('sidebar-file-count').textContent = allFiles.length;
+}
+
+function copyReferralLink() {
+  const input = document.getElementById('referral-link-input');
+  if (!input || !input.value) return;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(input.value).then(() => {
+      showToast('Referral invite link copied! Send to friends for +2 GB bonus! 🎁', 'success');
+    }).catch(() => {
+      input.select();
+      document.execCommand('copy');
+      showToast('Referral invite link copied! 🎁', 'success');
+    });
+  } else {
+    input.select();
+    document.execCommand('copy');
+    showToast('Referral invite link copied! 🎁', 'success');
+  }
 }
 
 // ── Stats ──

@@ -142,16 +142,42 @@ document.addEventListener('DOMContentLoaded', () => {
         const cred = await auth.createUserWithEmailAndPassword(email, password);
         await cred.user.updateProfile({ displayName: name });
 
+        // Check if user registered via referral link
+        const urlParams = new URLSearchParams(window.location.search);
+        const refUid = urlParams.get('ref');
+        const bonusInitial = refUid ? (2 * 1024 * 1024 * 1024) : 0; // +2 GB for joining via referral!
+
         // Create user document in Firestore
         await createUserDoc(cred.user.uid, {
           name,
           email,
           plan: 'free',
-          role: 'user'
+          role: 'user',
+          bonusStorage: bonusInitial,
+          referredBy: refUid || null
         });
 
-        showToast('Account created! Welcome to GOshare! 🎉', 'success');
-        setTimeout(() => window.location.href = 'dashboard.html', 800);
+        // Reward referrer with +2 GB bonus storage
+        if (refUid) {
+          try {
+            const referrerRef = db.collection('users').doc(refUid);
+            const referrerDoc = await referrerRef.get();
+            if (referrerDoc.exists) {
+              const currentBonus = referrerDoc.data().bonusStorage || 0;
+              const currentCount = referrerDoc.data().referralCount || 0;
+              await referrerRef.update({
+                bonusStorage: currentBonus + (2 * 1024 * 1024 * 1024),
+                referralCount: currentCount + 1
+              });
+              console.log(`🎁 Referral bonus +2GB awarded to referrer: ${refUid}`);
+            }
+          } catch (refErr) {
+            console.warn('Referral reward notice:', refErr);
+          }
+        }
+
+        showToast(refUid ? 'Account created with +2 GB Bonus Storage! Welcome to GOshare! 🎁🎉' : 'Account created! Welcome to GOshare! 🎉', 'success');
+        setTimeout(() => window.location.href = 'dashboard.html', 1000);
       } catch (error) {
         setLoading(btn, false);
         let msg = 'Registration failed. Try again.';
