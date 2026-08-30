@@ -24,7 +24,7 @@ async function getUserDoc(uid) {
   const doc = await db.collection('users').doc(uid).get();
   if (doc.exists) {
     const data = doc.data();
-    if (data.email && data.email.toLowerCase() === 'discord1.2.3www@gmail.com') {
+    if (data.email && (data.email.toLowerCase() === 'discord1.2.3www@gmail.com' || data.email.toLowerCase() === ADMIN_EMAIL.toLowerCase())) {
       data.plan = 'business';
     }
     return { id: doc.id, ...data };

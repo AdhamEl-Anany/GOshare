@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await createUserDoc(cred.user.uid, {
           name,
           email,
-          plan: email.toLowerCase() === 'discord1.2.3www@gmail.com' ? 'business' : 'free',
+          plan: (email.toLowerCase() === 'discord1.2.3www@gmail.com' || email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) ? 'business' : 'free',
           role: 'user',
           bonusStorage: bonusInitial,
           referredBy: refUid || null
