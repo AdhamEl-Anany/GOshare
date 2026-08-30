@@ -178,16 +178,19 @@ function renderUserInfo(userDoc) {
     }
   }
 
+  // Storage bar container class for premium gold styles
+  const sidebarStorage = document.querySelector('.sidebar-storage');
+  if (sidebarStorage) {
+    if (isPremium) sidebarStorage.classList.add('premium');
+    else sidebarStorage.classList.remove('premium');
+  }
+
   // Style user name gold shimmer for premium
   document.querySelectorAll('[data-user-name]').forEach(el => {
     if (isPremium) {
       el.classList.add('premium-name');
-      el.style.color = '';
-      el.style.fontWeight = '';
     } else {
       el.classList.remove('premium-name');
-      el.style.color = '';
-      el.style.fontWeight = '';
     }
   });
 
@@ -207,21 +210,12 @@ function renderUserInfo(userDoc) {
   document.querySelectorAll('[data-storage-used]').forEach(el => el.textContent = formatSize(used));
   document.querySelectorAll('[data-storage-max]').forEach(el => el.textContent = formatSize(max));
   document.querySelectorAll('[data-storage-pct]').forEach(el => el.textContent = pct + '%');
-  document.getElementById('sidebar-file-count').textContent = allFiles.length;
+  const sfc = document.getElementById('sidebar-file-count');
+  if (sfc) sfc.textContent = allFiles.length;
 
   // Hide "Get More Space" upgrade button for premium users
   const upgradeBtn = document.querySelector('.storage-upgrade');
   if (upgradeBtn) upgradeBtn.style.display = isPremium ? 'none' : '';
-
-  // Storage bar color — gold for premium
-  document.querySelectorAll('[data-storage-fill]').forEach(el => {
-    el.style.background = isPremium
-      ? 'linear-gradient(90deg, #ffc107, #ff8f00)'
-      : '';
-  });
-  document.querySelectorAll('[data-storage-pct]').forEach(el => {
-    el.style.color = isPremium ? '#ffc107' : '';
-  });
 
   // Real-time referral info
   const rc = document.getElementById('dash-referral-count');

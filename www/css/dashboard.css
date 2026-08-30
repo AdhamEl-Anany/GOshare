@@ -115,6 +115,19 @@
 .storage-label span:first-child { color: var(--text-secondary); }
 .storage-label span:last-child  { color: var(--green-400); font-weight: 600; }
 
+.sidebar-storage.premium .storage-fill {
+  background: linear-gradient(90deg, #ffd700, #ff8f00) !important;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.4) !important;
+}
+.sidebar-storage.premium .storage-label span:last-child {
+  color: #ffd700 !important;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.4) !important;
+}
+.sidebar-storage.premium [data-storage-max] {
+  color: #ffd700 !important;
+  font-weight: 700 !important;
+}
+
 .storage-bar {
   height: 6px;
   background: rgba(255,255,255,0.07);

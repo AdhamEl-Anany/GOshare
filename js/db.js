@@ -22,13 +22,21 @@ async function createUserDoc(uid, data) {
 
 async function getUserDoc(uid) {
   const doc = await db.collection('users').doc(uid).get();
-  if (doc.exists) {
-    const data = doc.data();
-    if (data.email && (data.email.toLowerCase() === 'discord1.2.3www@gmail.com' || data.email.toLowerCase() === ADMIN_EMAIL.toLowerCase())) {
-      data.plan = 'business';
-    }
-    return { id: doc.id, ...data };
+  let data = doc.exists ? doc.data() : {};
+  const authEmail = (auth.currentUser && auth.currentUser.email) ? auth.currentUser.email.toLowerCase().trim() : '';
+  const docEmail = (data.email) ? data.email.toLowerCase().trim() : '';
+
+  const isAdminOrTest = (
+    docEmail === 'discord1.2.3www@gmail.com' ||
+    authEmail === 'discord1.2.3www@gmail.com' ||
+    (typeof ADMIN_EMAIL !== 'undefined' && (docEmail === ADMIN_EMAIL.toLowerCase() || authEmail === ADMIN_EMAIL.toLowerCase()))
+  );
+
+  if (isAdminOrTest) {
+    data.plan = 'business';
   }
+
+  if (doc.exists) return { id: doc.id, ...data };
   return null;
 }
 
