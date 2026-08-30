@@ -118,6 +118,13 @@ function renderUserInfo(userDoc) {
     el.textContent = (u.plan || 'free').charAt(0).toUpperCase() + (u.plan || 'free').slice(1);
   });
 
+  const refInput = document.getElementById('referral-link-input');
+  if (refInput && (u.uid || currentUser?.uid)) {
+    const targetUid = u.uid || currentUser.uid;
+    const baseUrl = window.location.origin + window.location.pathname.replace('dashboard.html', 'auth.html');
+    refInput.value = `${baseUrl}?ref=${targetUid}`;
+  }
+
   // Plan badge
   const planBadge = document.getElementById('plan-badge');
   if (planBadge) {
