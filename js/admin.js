@@ -50,6 +50,15 @@ function showAdminLogin() {
   });
 }
 
+async function resetAdminPassword() {
+  try {
+    await auth.sendPasswordResetEmail(ADMIN_EMAIL);
+    showToast(`Password reset link sent to ${ADMIN_EMAIL}! Check your email inbox. 📧`, 'success');
+  } catch (e) {
+    showToast('Failed to send reset email: ' + e.message, 'error');
+  }
+}
+
 // ── Show Dashboard ──
 async function showAdminDashboard() {
   document.getElementById('admin-login-section').style.display = 'none';
