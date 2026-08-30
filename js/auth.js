@@ -373,17 +373,20 @@ async function triggerUserPasswordReset(e) {
   }
 
   if (!email || !validateEmail(email)) {
-    showToast('Please enter a valid email address.', 'error');
+    alert('Please enter a valid email address.');
     return;
   }
 
   try {
     await auth.sendPasswordResetEmail(email);
-    showToast(`Password reset link sent to "${email}"! Check your email inbox. 📧`, 'success');
+    alert(`✅ Password Reset Link Sent!\n\nAn official Firebase password reset email has been sent to:\n${email}\n\nPlease check your email inbox (and Spam folder).`);
+    if (typeof showToast === 'function') showToast(`Reset link sent to ${email}`, 'success');
   } catch (error) {
-    let msg = 'Failed to send password reset email.';
-    if (error.code === 'auth/user-not-found') msg = 'No account registered with this email address.';
-    else if (error.code === 'auth/invalid-email') msg = 'Invalid email address format.';
-    showToast(msg, 'error');
+    console.error('Password reset error:', error);
+    if (error.code === 'auth/user-not-found') {
+      alert(`⚠️ Account Not Found:\n\nNo account with email "${email}" is registered in Firebase Auth.\n\nPlease check the spelling or sign up for a new account.`);
+    } else {
+      alert(`❌ Error sending reset email:\n\n${error.message}`);
+    }
   }
 }

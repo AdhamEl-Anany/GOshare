@@ -51,11 +51,25 @@ function showAdminLogin() {
 }
 
 async function resetAdminPassword() {
+  const emailInput = document.getElementById('admin-email');
+  const targetEmail = (emailInput && emailInput.value.trim()) ? emailInput.value.trim() : ADMIN_EMAIL;
+  
+  if (!targetEmail || !targetEmail.includes('@')) {
+    alert('Please enter a valid Admin Email address.');
+    return;
+  }
+
   try {
-    await auth.sendPasswordResetEmail(ADMIN_EMAIL);
-    showToast(`Password reset link sent to ${ADMIN_EMAIL}! Check your email inbox. 📧`, 'success');
+    await auth.sendPasswordResetEmail(targetEmail);
+    alert(`✅ Password Reset Sent!\n\nAn official password reset email has been sent to:\n${targetEmail}\n\nPlease check your email inbox (and Spam folder) to set a new password.`);
+    if (typeof showToast === 'function') showToast(`Reset email sent to ${targetEmail}`, 'success');
   } catch (e) {
-    showToast('Failed to send reset email: ' + e.message, 'error');
+    console.error('Password reset error:', e);
+    if (e.code === 'auth/user-not-found') {
+      alert(`⚠️ Account Not Found in Firebase:\n\nNo account with email "${targetEmail}" exists in Firebase Auth yet.\n\nPlease register this account on auth.html first.`);
+    } else {
+      alert(`❌ Firebase Auth Error:\n\n${e.message}`);
+    }
   }
 }
 
