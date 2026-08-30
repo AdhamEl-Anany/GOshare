@@ -161,20 +161,20 @@ function renderUserInfo(userDoc) {
     refInput.value = `${baseUrl}?ref=${targetUid}`;
   }
 
-  // Plan badge
+  // Plan badge — gold for pro/business
   const planBadge = document.getElementById('plan-badge');
   if (planBadge) {
     if (u.plan === 'pro') {
-      planBadge.textContent = '💎 Pro';
-      planBadge.className = 'badge badge-green';
+      planBadge.innerHTML = '✦ Pro';
+      planBadge.className = 'badge badge-gold';
       planBadge.style.display = 'inline-flex';
     } else if (u.plan === 'business') {
-      planBadge.textContent = '🏢 Business';
-      planBadge.className = 'badge badge-diamond';
+      planBadge.innerHTML = '✦ Business';
+      planBadge.className = 'badge badge-gold';
       planBadge.style.display = 'inline-flex';
     } else {
-      planBadge.textContent = '🌱 Free';
-      planBadge.className = 'badge badge-green';
+      planBadge.textContent = 'Free';
+      planBadge.className = 'badge badge-free';
       planBadge.style.display = 'inline-flex';
     }
   }
@@ -191,6 +191,12 @@ function renderUserInfo(userDoc) {
   document.querySelectorAll('[data-storage-max]').forEach(el => el.textContent = formatSize(max));
   document.querySelectorAll('[data-storage-pct]').forEach(el => el.textContent = pct + '%');
   document.getElementById('sidebar-file-count').textContent = allFiles.length;
+
+  // Hide "Get More Space" upgrade button for premium users
+  const upgradeBtn = document.querySelector('.storage-upgrade');
+  if (upgradeBtn) {
+    upgradeBtn.style.display = (u.plan === 'pro' || u.plan === 'business') ? 'none' : '';
+  }
 
   // Real-time referral info
   const rc = document.getElementById('dash-referral-count');
