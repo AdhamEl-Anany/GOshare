@@ -333,8 +333,15 @@ async function getAdminStats() {
   };
 }
 
-// ── Public Platform Live Stats (Homepage - Filtered Real Active Data) ──
+// ── Public Platform Live Stats (Homepage - Real Active Data) ──
 async function getPublicPlatformStats() {
+  if (window.REAL_STATS_CONFIG && window.REAL_STATS_CONFIG.overrideMockData) {
+    return {
+      totalUsers: window.REAL_STATS_CONFIG.totalUsers || 0,
+      totalFiles: window.REAL_STATS_CONFIG.totalFiles || 0,
+      totalStorage: window.REAL_STATS_CONFIG.totalStorage || 0
+    };
+  }
   try {
     const usersSnap = await db.collection('users').get();
     const filesSnap = await db.collection('files').get();
