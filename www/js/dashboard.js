@@ -163,6 +163,7 @@ function renderUserInfo(userDoc) {
 
   // Plan badge — gold for pro/business
   const planBadge = document.getElementById('plan-badge');
+  const isPremium = (u.plan === 'pro' || u.plan === 'business');
   if (planBadge) {
     if (u.plan === 'pro') {
       planBadge.innerHTML = '✦ Pro';
@@ -173,11 +174,20 @@ function renderUserInfo(userDoc) {
       planBadge.className = 'badge badge-gold';
       planBadge.style.display = 'inline-flex';
     } else {
-      planBadge.textContent = 'Free';
-      planBadge.className = 'badge badge-free';
-      planBadge.style.display = 'inline-flex';
+      planBadge.style.display = 'none';
     }
   }
+
+  // Style user name gold for premium
+  document.querySelectorAll('[data-user-name]').forEach(el => {
+    el.style.color = isPremium ? '#ffc107' : '';
+    el.style.fontWeight = isPremium ? '700' : '';
+  });
+
+  // Hide upgrade buttons/links for premium users
+  document.querySelectorAll('.nav-upgrade-btn, .nav-upgrade-dropdown').forEach(el => {
+    el.style.display = isPremium ? 'none' : '';
+  });
 
   // Storage
   const used = allFiles.reduce((sum, f) => sum + (f.size || 0), 0);
@@ -194,9 +204,17 @@ function renderUserInfo(userDoc) {
 
   // Hide "Get More Space" upgrade button for premium users
   const upgradeBtn = document.querySelector('.storage-upgrade');
-  if (upgradeBtn) {
-    upgradeBtn.style.display = (u.plan === 'pro' || u.plan === 'business') ? 'none' : '';
-  }
+  if (upgradeBtn) upgradeBtn.style.display = isPremium ? 'none' : '';
+
+  // Storage bar color — gold for premium
+  document.querySelectorAll('[data-storage-fill]').forEach(el => {
+    el.style.background = isPremium
+      ? 'linear-gradient(90deg, #ffc107, #ff8f00)'
+      : '';
+  });
+  document.querySelectorAll('[data-storage-pct]').forEach(el => {
+    el.style.color = isPremium ? '#ffc107' : '';
+  });
 
   // Real-time referral info
   const rc = document.getElementById('dash-referral-count');

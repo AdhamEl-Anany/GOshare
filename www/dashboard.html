@@ -29,11 +29,12 @@
     </div>
 
     <div class="nav-actions">
-      <a href="pricing.html" class="btn btn-diamond btn-sm">💎 Upgrade</a>
+      <a href="pricing.html" class="btn btn-diamond btn-sm nav-upgrade-btn">💎 Upgrade</a>
       <div style="position:relative">
         <button class="btn btn-glass btn-sm" id="user-menu-btn" style="gap:8px">
           <span style="width:28px;height:28px;border-radius:50%;background:var(--grad-green);display:inline-flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;flex-shrink:0">👤</span>
           <span data-user-name>User</span>
+          <span id="plan-badge" class="badge badge-free" style="display:none"></span>
           ▾
         </button>
         <div id="user-dropdown" style="display:none;position:absolute;right:0;top:calc(100% + 8px);background:var(--bg-card2);border:1px solid var(--glass-border);border-radius:var(--radius-md);padding:6px;min-width:210px;z-index:200;box-shadow:var(--shadow-card)">
@@ -41,7 +42,7 @@
             <div style="font-size:0.85rem;font-weight:600" data-user-name>User</div>
             <div style="font-size:0.78rem;color:var(--text-muted)" data-user-email>email</div>
           </div>
-          <a href="pricing.html" class="context-menu-item">💎 &nbsp; Upgrade Plan</a>
+          <a href="pricing.html" class="context-menu-item nav-upgrade-dropdown">💎 &nbsp; Upgrade Plan</a>
           <div class="context-menu-item" onclick="openAccountSettingsModal()">⚙️ &nbsp; Account & Privacy</div>
           <div class="context-menu-item" onclick="triggerAccountDeletion()" style="color:#ff5252">⚠️ &nbsp; Delete Account & Data</div>
           <div class="context-menu-item" onclick="globalLogout('index.html')">🚪 &nbsp; Logout</div>
