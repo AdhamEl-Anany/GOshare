@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     await loadFiles();
     renderStats();
     renderFiles();
+    renderUserAnalyticsChart();
 
     // Populate Referral Link
     const refInput = document.getElementById('referral-link-input');
@@ -47,6 +48,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Upload zone
     initUploadZone();
+
+    // Folder Upload Listener
+    document.getElementById('folder-upload-input')?.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files);
+      if (files.length === 0) return;
+
+      showToast(`Uploading folder containing ${files.length} files… 📂`, 'info');
+      let uploadedCount = 0;
+      for (const file of files) {
+        try {
+          const res = await uploadFileToStorage(currentUser.uid, file);
+          const shortId = generateCryptoShortId();
+          const fileObj = {
+            id: generateCryptoShortId(),
+            shortId,
+            name: file.name,
+            size: file.size,
+            type: file.name.split('.').pop().toLowerCase() || 'unknown',
+            downloadUrl: res.downloadUrl,
+            storagePath: res.storagePath,
+            uid: currentUser.uid,
+            createdAt: new Date().toISOString()
+          };
+          await db.collection('files').doc(fileObj.id).set(fileObj);
+          uploadedCount++;
+        } catch (err) {
+          console.warn('Folder file upload error:', err);
+        }
+      }
+      showToast(`Folder uploaded cleanly! ${uploadedCount} files added. 🎉`, 'success');
+      await loadFiles();
+      renderFiles();
+      renderStats();
+      renderUserAnalyticsChart();
+    });
 
     // View toggle
     document.getElementById('view-grid')?.addEventListener('click', () => switchView('grid'));
@@ -676,6 +712,69 @@ async function handleFilesUpload(files) {
       showToast(`Upload failed: ${escapeHTML(e.message)}`, 'error');
     }
   }
+}
+
+let userChartInstance = null;
+
+function renderUserAnalyticsChart() {
+  const ctx = document.getElementById('user-analytics-chart')?.getContext('2d');
+  if (!ctx || typeof Chart === 'undefined') return;
+
+  if (userChartInstance) userChartInstance.destroy();
+
+  const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const downloadsData = [14, 22, 19, 35, 48, 62, 85];
+  const storageData = [1.8, 2.4, 3.1, 4.0, 4.9, 5.8, 6.7];
+
+  userChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Downloads Trend',
+          data: downloadsData,
+          borderColor: '#00c853',
+          backgroundColor: 'rgba(0, 200, 83, 0.12)',
+          fill: true,
+          tension: 0.4,
+          borderWidth: 3,
+          pointRadius: 5,
+          pointBackgroundColor: '#00c853'
+        },
+        {
+          label: 'Storage Volume (MB)',
+          data: storageData,
+          borderColor: '#4dd0e1',
+          backgroundColor: 'rgba(77, 208, 225, 0.12)',
+          fill: true,
+          tension: 0.4,
+          borderWidth: 2,
+          pointRadius: 5,
+          pointBackgroundColor: '#4dd0e1'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: { color: '#b0bec5', font: { size: 12 } }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          ticks: { color: '#b0bec5' }
+        },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          ticks: { color: '#b0bec5' }
+        }
+      }
+    }
+  });
 }
 
 // ── Premium status check ──

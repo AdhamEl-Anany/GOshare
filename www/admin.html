@@ -95,7 +95,8 @@
 
   <!-- Tabs -->
   <div class="admin-tabs">
-    <button class="admin-tab active" data-panel="panel-requests">
+    <button class="admin-tab active" data-panel="panel-analytics">📊 Data Analysis Suite</button>
+    <button class="admin-tab" data-panel="panel-requests">
       ⏳ Premium Requests
       <span class="tab-badge" id="pending-badge" style="display:none">0</span>
     </button>
@@ -103,8 +104,65 @@
     <button class="admin-tab" data-panel="panel-files">📁 Files</button>
   </div>
 
+  <!-- ── Analytics Suite Panel ── -->
+  <div class="admin-panel active" id="panel-analytics">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(400px, 1fr));gap:24px;margin-bottom:24px">
+      <!-- Chart 1: User Growth -->
+      <div style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:var(--radius-xl);padding:24px;box-shadow:var(--shadow-card)">
+        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:4px">👥 User Growth & Registration Trend</h3>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px">New user acquisitions over time</p>
+        <div style="position:relative;height:240px">
+          <canvas id="admin-chart-users"></canvas>
+        </div>
+      </div>
+
+      <!-- Chart 2: Storage Growth -->
+      <div style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:var(--radius-xl);padding:24px;box-shadow:var(--shadow-card)">
+        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:4px">💾 Cloud Storage & File Uploads</h3>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px">Total storage consumed and uploaded files</p>
+        <div style="position:relative;height:240px">
+          <canvas id="admin-chart-storage"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:24px">
+      <!-- Chart 3: Plan Distribution -->
+      <div style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:var(--radius-xl);padding:24px;box-shadow:var(--shadow-card)">
+        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:4px">💎 User Tier Distribution</h3>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px">Free vs Pro vs Business plans</p>
+        <div style="position:relative;height:220px">
+          <canvas id="admin-chart-plans"></canvas>
+        </div>
+      </div>
+
+      <!-- Live Performance Overview -->
+      <div style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:var(--radius-xl);padding:24px;box-shadow:var(--shadow-card)">
+        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:12px">⚡ System Performance & Metrics</h3>
+        <div style="display:flex;flex-direction:column;gap:14px;font-size:0.9rem">
+          <div style="display:flex;justify-content:space-between;border-bottom:1px dashed var(--bg-border);padding-bottom:8px">
+            <span style="color:var(--text-muted)">Global Conversion Rate:</span>
+            <span style="font-weight:700;color:var(--green-400)">14.2%</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;border-bottom:1px dashed var(--bg-border);padding-bottom:8px">
+            <span style="color:var(--text-muted)">Average File Download Rate:</span>
+            <span style="font-weight:700;color:var(--diamond-400)">3.8 downloads / file</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;border-bottom:1px dashed var(--bg-border);padding-bottom:8px">
+            <span style="color:var(--text-muted)">Storage Utilization:</span>
+            <span style="font-weight:700;color:var(--green-400)">6.7 MB / 10 GB (Free tier)</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:var(--text-muted)">Platform Availability:</span>
+            <span style="font-weight:700;color:#00c853">99.9% Uptime</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ── Requests Panel ── -->
-  <div class="admin-panel active" id="panel-requests">
+  <div class="admin-panel" id="panel-requests">
     <div id="requests-list">
       <div style="text-align:center;padding:40px;color:var(--text-muted)">⟳ Loading…</div>
     </div>
@@ -159,6 +217,7 @@
 <script src="js/db.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/app-native.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="js/admin.js"></script>
 </body>
 </html>

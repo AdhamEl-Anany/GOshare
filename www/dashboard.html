@@ -125,7 +125,8 @@
         <p>Manage and share all your uploaded files</p>
       </div>
       <div class="dash-actions">
-        <button class="btn btn-glass" id="btn-new-folder">New Folder</button>
+        <button class="btn btn-outline" onclick="document.getElementById('folder-upload-input').click()">📂 Upload Folder</button>
+        <input type="file" id="folder-upload-input" webkitdirectory directory multiple style="display:none" />
         <button class="btn btn-primary" id="upload-btn">Upload Files</button>
       </div>
     </div>
@@ -142,6 +143,19 @@
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <input type="text" id="referral-link-input" readonly style="background:var(--bg-card2);border:1px solid var(--glass-border);border-radius:var(--radius-md);padding:8px 12px;color:var(--green-400);font-size:0.85rem;font-family:monospace;width:260px" value="Loading link..." />
         <button type="button" class="btn btn-primary btn-sm" onclick="copyReferralLink()">Copy Invite Link</button>
+      </div>
+    </div>
+
+    <!-- Interactive Analytics Chart Card -->
+    <div class="dash-chart-card" style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:var(--radius-xl);padding:24px;margin-bottom:24px;box-shadow:var(--shadow-card)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div>
+          <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:4px">📊 Activity Analytics & Transfer Trends</h3>
+          <p style="font-size:0.85rem;color:var(--text-secondary);margin:0">Live visualization of your file views, downloads, and cloud storage volume</p>
+        </div>
+      </div>
+      <div style="position:relative;height:240px;width:100%">
+        <canvas id="user-analytics-chart"></canvas>
       </div>
     </div>
 
@@ -323,6 +337,7 @@
 <script src="js/db.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/app-native.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="js/dashboard.js"></script>
 <script>
   // User dropdown

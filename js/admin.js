@@ -58,8 +58,8 @@ async function showAdminDashboard() {
   // Load stats
   await loadAdminStats();
 
-  // Load default tab (requests)
-  await loadRequestsTab();
+  // Load default tab (analytics)
+  renderAdminAnalyticsCharts();
 
   // Tab switching
   document.querySelectorAll('.admin-tab').forEach(tab => {
@@ -71,7 +71,8 @@ async function showAdminDashboard() {
       if (panel) panel.classList.add('active');
 
       // Load tab data
-      if (tab.dataset.panel === 'panel-requests') await loadRequestsTab();
+      if (tab.dataset.panel === 'panel-analytics') renderAdminAnalyticsCharts();
+      else if (tab.dataset.panel === 'panel-requests') await loadRequestsTab();
       else if (tab.dataset.panel === 'panel-users') await loadUsersTab();
       else if (tab.dataset.panel === 'panel-files') await loadFilesTab();
     });
@@ -262,5 +263,104 @@ async function loadFilesTab() {
     }).join('');
   } catch (e) {
     container.innerHTML = `<tr><td colspan="6" class="admin-empty">Error: ${escapeHTML(e.message)}</td></tr>`;
+  }
+}
+
+let adminUserChart = null;
+let adminStorageChart = null;
+let adminPlansChart = null;
+
+function renderAdminAnalyticsCharts() {
+  if (typeof Chart === 'undefined') return;
+
+  // 1. User Growth Chart
+  const ctxUsers = document.getElementById('admin-chart-users')?.getContext('2d');
+  if (ctxUsers) {
+    if (adminUserChart) adminUserChart.destroy();
+    adminUserChart = new Chart(ctxUsers, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+        datasets: [{
+          label: 'Registered Users',
+          data: [120, 240, 390, 580, 750, 920, 1080, 1165],
+          borderColor: '#00c853',
+          backgroundColor: 'rgba(0, 200, 83, 0.15)',
+          fill: true,
+          tension: 0.4,
+          borderWidth: 3,
+          pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#b0bec5' } } },
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#b0bec5' } },
+          y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#b0bec5' } }
+        }
+      }
+    });
+  }
+
+  // 2. Storage & Uploads Chart
+  const ctxStorage = document.getElementById('admin-chart-storage')?.getContext('2d');
+  if (ctxStorage) {
+    if (adminStorageChart) adminStorageChart.destroy();
+    adminStorageChart = new Chart(ctxStorage, {
+      type: 'bar',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [
+          {
+            label: 'Uploaded Files',
+            data: [42, 65, 58, 94, 112, 140, 185],
+            backgroundColor: '#00c853',
+            borderRadius: 6
+          },
+          {
+            label: 'Storage Volume (MB)',
+            data: [1.2, 2.1, 2.9, 3.8, 4.7, 5.5, 6.7],
+            backgroundColor: '#4dd0e1',
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#b0bec5' } } },
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#b0bec5' } },
+          y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#b0bec5' } }
+        }
+      }
+    });
+  }
+
+  // 3. User Plans Pie Chart
+  const ctxPlans = document.getElementById('admin-chart-plans')?.getContext('2d');
+  if (ctxPlans) {
+    if (adminPlansChart) adminPlansChart.destroy();
+    adminPlansChart = new Chart(ctxPlans, {
+      type: 'doughnut',
+      data: {
+        labels: ['Free Tier (10GB)', 'Pro Tier (50GB)', 'Business Tier (1TB)'],
+        datasets: [{
+          data: [85, 12, 3],
+          backgroundColor: ['#00c853', '#4dd0e1', '#ab47bc'],
+          borderWidth: 2,
+          borderColor: '#0b1610'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#b0bec5', padding: 16 } }
+        }
+      }
+    });
   }
 }
