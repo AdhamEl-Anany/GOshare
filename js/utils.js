@@ -363,18 +363,18 @@ function renderNavLoggedIn(container, name) {
   container.dataset.authState = 'logged-in';
   container.innerHTML = `
     <button type="button" class="btn btn-glass btn-sm theme-toggle-btn" onclick="toggleTheme()" style="padding:6px 10px;font-size:1.1rem" title="Toggle Theme">${isLight ? '☀️' : '🌙'}</button>
-    <a href="dashboard.html" class="btn btn-glass btn-sm">📁 My Dashboard</a>
+    <a href="dashboard.html" class="btn btn-glass btn-sm">My Dashboard</a>
     <div style="position:relative;display:inline-block">
       <button type="button" class="btn btn-glass btn-sm nav-username" onclick="toggleNavUserDropdown(event)" style="font-weight:600;color:var(--green-400);display:flex;align-items:center;gap:6px">
-        👤 ${escapeHTML(name)} ▾
+        ${escapeHTML(name)} ▾
       </button>
-      <div id="nav-user-menu" style="display:none;position:absolute;right:0;top:calc(100% + 8px);background:var(--bg-card2);border:1px solid var(--glass-border);border-radius:var(--radius-md);padding:6px;min-width:210px;z-index:99999;box-shadow:var(--shadow-card)">
-        <a href="dashboard.html" style="display:flex;align-items:center;gap:8px;padding:8px 12px;color:var(--text-primary);text-decoration:none;font-size:0.85rem;border-radius:var(--radius-sm)">📁 My Dashboard</a>
-        <a href="pricing.html" style="display:flex;align-items:center;gap:8px;padding:8px 12px;color:var(--text-primary);text-decoration:none;font-size:0.85rem;border-radius:var(--radius-sm)">💎 Upgrade Plan</a>
-        <a href="privacy.html" style="display:flex;align-items:center;gap:8px;padding:8px 12px;color:var(--text-primary);text-decoration:none;font-size:0.85rem;border-radius:var(--radius-sm)">🔒 Privacy Policy</a>
-        <a href="delete-account.html" style="display:flex;align-items:center;gap:8px;padding:8px 12px;color:#ff5252;text-decoration:none;font-size:0.85rem;border-radius:var(--radius-sm);font-weight:600">⚠️ Delete Account & Data</a>
+      <div id="nav-user-menu" style="display:none;position:absolute;right:0;top:calc(100% + 8px);background:var(--bg-card2);border:1px solid var(--glass-border);border-radius:var(--radius-md);padding:6px;min-width:190px;z-index:99999;box-shadow:var(--shadow-card)">
+        <a href="dashboard.html" style="display:flex;align-items:center;gap:8px;padding:8px 12px;color:var(--text-primary);text-decoration:none;font-size:0.85rem;border-radius:var(--radius-sm)">My Dashboard</a>
+        <a href="pricing.html" style="display:flex;align-items:center;gap:8px;padding:8px 12px;color:var(--text-primary);text-decoration:none;font-size:0.85rem;border-radius:var(--radius-sm)">Upgrade Plan</a>
+        <a href="privacy.html" style="display:flex;align-items:center;gap:8px;padding:8px 12px;color:var(--text-primary);text-decoration:none;font-size:0.85rem;border-radius:var(--radius-sm)">Privacy Policy</a>
+        <a href="delete-account.html" style="display:flex;align-items:center;gap:8px;padding:8px 12px;color:#ff5252;text-decoration:none;font-size:0.85rem;border-radius:var(--radius-sm);font-weight:600">Delete Account & Data</a>
         <div style="height:1px;background:var(--bg-border);margin:4px 0"></div>
-        <button type="button" onclick="globalLogout('index.html')" style="width:100%;text-align:left;display:flex;align-items:center;gap:8px;padding:8px 12px;color:#ef5350;background:none;border:none;font-size:0.85rem;cursor:pointer;border-radius:var(--radius-sm)">🚪 Logout</button>
+        <button type="button" onclick="globalLogout('index.html')" style="width:100%;text-align:left;display:flex;align-items:center;gap:8px;padding:8px 12px;color:#ef5350;background:none;border:none;font-size:0.85rem;cursor:pointer;border-radius:var(--radius-sm)">Logout</button>
       </div>
     </div>
     <div class="nav-hamburger" id="nav-hamburger"><span></span><span></span><span></span></div>
