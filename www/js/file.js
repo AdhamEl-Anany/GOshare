@@ -251,8 +251,19 @@ async function startDownload(file) {
   }
 
   let pct = 0;
+  const isApp = window.isCapacitorApp || (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+  const stepIncrement = isApp ? 50 : 25; // 3 seconds on Web (750ms * 4 = 3s high CPM viewability), fast on App!
+  const stepDelay = isApp ? 100 : 750;
+
   const interval = setInterval(() => {
-    pct += 25;
+    pct += stepIncrement;
+    if (statusText) {
+      const remainingSeconds = Math.max(1, Math.ceil((100 - pct) / 33));
+      statusText.textContent = isApp ? 'Preparing download…' : `⚡ Securing cloud link (${remainingSeconds}s)…`;
+    }
+    if (progressFill) progressFill.style.width = pct + '%';
+    if (progressText) progressText.textContent = Math.min(100, pct) + '%';
+
     if (pct >= 100) {
       pct = 100;
       clearInterval(interval);
@@ -286,12 +297,8 @@ async function startDownload(file) {
         btn.style.background = '';
         if (progressSection) progressSection.style.display = 'none';
       }, 3000);
-    } else {
-      if (progressFill) progressFill.style.width = pct + '%';
-      if (progressText) progressText.textContent = pct + '%';
-      if (statusText)   statusText.textContent = `Preparing… ${formatSize(file.size * pct / 100)} / ${formatSize(file.size)}`;
     }
-  }, 100);
+  }, stepDelay);
 }
 
 function showFileNotFound() {

@@ -8,12 +8,22 @@
   <meta name="monetag" content="56def8193353e62909bee9fb3937d9fe" />
   <script>
     if (!window.Capacitor || !window.Capacitor.isNativePlatform || !window.Capacitor.isNativePlatform()) {
+      // 1. Social Bar Ad (Highest CTR: 23.33%)
       const s1 = document.createElement('script');
       s1.src = 'https://pl30960805.profitableratecpmnetwork.com/16/0e/50/160e509493247873e5e914ed37a4e345.js';
       document.head.appendChild(s1);
+
+      // 2. Popunder Ad Unit
       const s2 = document.createElement('script');
       s2.src = 'https://pl30960806.profitableratecpmnetwork.com/51/55/dc/5155dcc51554481c8a5084fa699d460f.js';
       document.head.appendChild(s2);
+
+      // 3. Native Banner Unit
+      const s3 = document.createElement('script');
+      s3.async = true;
+      s3.dataset.cfasync = "false";
+      s3.src = 'https://pl30960807.profitableratecpmnetwork.com/38f88bc9a1ff0b92c30f492a87999717/invoke.js';
+      document.head.appendChild(s3);
     }
   </script>
   <link rel="icon" type="image/jpeg" href="assets/images/logo-square.jpeg" />
