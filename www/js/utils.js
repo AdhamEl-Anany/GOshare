@@ -409,6 +409,20 @@ document.addEventListener('click', (e) => {
 // Init theme immediately before render to avoid flicker
 initThemeToggle();
 
+// Smart Ad Container Auto-Collapse (Hides empty dashed boxes if AdBlocker or no-fill occurs)
+function initSmartAdContainers() {
+  setTimeout(() => {
+    document.querySelectorAll('.ad-slot-wrap').forEach(wrap => {
+      const containerChild = wrap.querySelector('[id*="container-"], [id*="ad-slot-"]');
+      const hasIframeOrImg = wrap.querySelector('iframe, img, a[href*="http"]');
+      const isFilled = hasIframeOrImg || (containerChild && containerChild.children.length > 0);
+      if (!isFilled) {
+        wrap.style.display = 'none';
+      }
+    });
+  }, 3000);
+}
+
 // Init on load
 document.addEventListener('DOMContentLoaded', () => {
   initThemeToggle();
@@ -417,4 +431,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initCounters();
   initMobileMenu();
   initGlobalNavAuth();
+  initSmartAdContainers();
 });
