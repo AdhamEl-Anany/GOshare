@@ -362,3 +362,28 @@ async function loginWithGithub() {
     }
   }
 }
+
+async function triggerUserPasswordReset(e) {
+  if (e) e.preventDefault();
+  const emailInput = document.getElementById('login-email');
+  let email = emailInput ? emailInput.value.trim() : '';
+
+  if (!email || !validateEmail(email)) {
+    email = prompt('Enter your registered email address to receive a password reset link:');
+  }
+
+  if (!email || !validateEmail(email)) {
+    showToast('Please enter a valid email address.', 'error');
+    return;
+  }
+
+  try {
+    await auth.sendPasswordResetEmail(email);
+    showToast(`Password reset link sent to "${email}"! Check your email inbox. 📧`, 'success');
+  } catch (error) {
+    let msg = 'Failed to send password reset email.';
+    if (error.code === 'auth/user-not-found') msg = 'No account registered with this email address.';
+    else if (error.code === 'auth/invalid-email') msg = 'Invalid email address format.';
+    showToast(msg, 'error');
+  }
+}

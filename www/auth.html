@@ -434,7 +434,7 @@
               <label class="auth-check">
                 <input type="checkbox" id="remember-me" /> Remember me
               </label>
-              <a href="#" class="auth-forgot">Forgot password?</a>
+              <a href="#" class="auth-forgot" onclick="triggerUserPasswordReset(event);return false;">Forgot password?</a>
             </div>
 
             <button type="submit" class="btn btn-primary auth-submit" id="login-submit">
