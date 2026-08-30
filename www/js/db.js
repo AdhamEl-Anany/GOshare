@@ -333,18 +333,41 @@ async function getAdminStats() {
   };
 }
 
-// ── Public Platform Live Stats (Homepage) ──
+// ── Public Platform Live Stats (Homepage - Filtered Real Active Data) ──
 async function getPublicPlatformStats() {
   try {
     const usersSnap = await db.collection('users').get();
     const filesSnap = await db.collection('files').get();
 
-    const totalUsers = usersSnap.size || 0;
-    const totalFiles = filesSnap.size || 0;
+    // Filter real registered active users
+    let totalUsers = 0;
+    usersSnap.forEach(doc => {
+      const data = doc.data();
+      if (!data) return;
+      const email = (data.email || '').toLowerCase().trim();
+      const name = (data.name || '').toLowerCase().trim();
+      // Exclude empty, dummy test, or mock emails/accounts
+      const isDummy = !email || email.includes('test') || email.includes('example.com') || email.includes('mock') || email.startsWith('dummy');
+      if (!isDummy && (email.includes('@') || name.length > 1)) {
+        totalUsers++;
+      }
+    });
 
+    // Filter real uploaded valid files & compute actual storage used
+    let totalFiles = 0;
     let totalStorage = 0;
     filesSnap.forEach(doc => {
-      totalStorage += (doc.data().size || 0);
+      const data = doc.data();
+      if (!data) return;
+      const fileName = (data.name || '').trim();
+      const size = data.size || 0;
+      const url = data.downloadUrl || data.storagePath || '';
+      // Exclude empty/dummy test files
+      const isDummyFile = !fileName || fileName.toLowerCase().includes('dummy') || fileName.toLowerCase().includes('test-file') || size === 0 || !url;
+      if (!isDummyFile) {
+        totalFiles++;
+        totalStorage += size;
+      }
     });
 
     return {
