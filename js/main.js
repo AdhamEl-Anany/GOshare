@@ -58,7 +58,7 @@ async function loadPublicStats() {
 function initTypingEffect() {
   const el = document.getElementById('typing-text');
   if (!el) return;
-  const words = ['Fast', 'Secure', 'Simple', 'Reliable', 'Instant'];
+  const words = ['Fast', 'Simple', 'Reliable', 'Instant', 'Unlimited', 'Effortless'];
   let wordIndex = 0;
   let charIndex = 0;
   let deleting = false;
