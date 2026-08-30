@@ -9,6 +9,16 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📱 GOshare Native Android App Mode Active');
     initAndroidBackButton();
     initAndroidStatusBar();
+
+    // 1. Hide web-only elements (e.g. APK download banners & links) inside Native Android App
+    document.querySelectorAll('.web-only-content, [data-web-only], a[href*=".apk"]').forEach(el => {
+      el.style.display = 'none';
+    });
+
+    // 2. Suppress popunder/redirect ad scripts inside Native App
+    document.querySelectorAll('script[src*="profitableratecpmnetwork.com"]').forEach(s => {
+      s.remove();
+    });
   }
 });
 
