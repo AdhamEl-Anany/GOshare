@@ -819,3 +819,26 @@ img, video, canvas, iframe, table, input, button {
   text-shadow: 0 0 12px rgba(255,193,7,0.5);
   box-shadow: 0 0 10px rgba(255,193,7,0.12);
 }
+
+/* ── Gold Shimmer Name for Premium Users ── */
+@keyframes goldShimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.premium-name {
+  background: linear-gradient(
+    90deg,
+    #b8860b 0%,
+    #ffd700 25%,
+    #fffacd 50%,
+    #ffd700 75%,
+    #b8860b 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: goldShimmer 2.5s linear infinite;
+  font-weight: 700;
+}

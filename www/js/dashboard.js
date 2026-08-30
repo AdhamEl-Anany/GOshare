@@ -178,10 +178,17 @@ function renderUserInfo(userDoc) {
     }
   }
 
-  // Style user name gold for premium
+  // Style user name gold shimmer for premium
   document.querySelectorAll('[data-user-name]').forEach(el => {
-    el.style.color = isPremium ? '#ffc107' : '';
-    el.style.fontWeight = isPremium ? '700' : '';
+    if (isPremium) {
+      el.classList.add('premium-name');
+      el.style.color = '';
+      el.style.fontWeight = '';
+    } else {
+      el.classList.remove('premium-name');
+      el.style.color = '';
+      el.style.fontWeight = '';
+    }
   });
 
   // Hide upgrade buttons/links for premium users
